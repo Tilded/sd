@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadowdark RPG Complete Reference</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+        
+        :root {
+            --parchment: #f4f1e8;
+            --dark-parchment: #e8e3d3;
+            --ink: #2c1810;
+            --blood-red: #8b0000;
+            --shadow: #4a3728;
+            --gold: #d4af37;
+            --border: #8b7355;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: linear-gradient(135deg, var(--parchment) 0%, var(--dark-parchment) 100%);
+            color: var(--ink);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--parchment);
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            border: 3px solid var(--border);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(139, 0, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            text-align: center;
+            color: var(--blood-red);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-bottom: 3px double var(--border);
+            position: relative;
+        }
+
+        h1::after {
+            content: '⚔️';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -1.5rem;
+            background: var(--parchment);
+            padding: 0 1rem;
+            font-size: 1.5rem;
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: var(--blood-red);
+            margin: 2rem 0 1rem 0;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        h2:hover {
+            color: var(--gold);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            color: var(--shadow);
+            margin: 1.5rem 0 0.8rem 0;
+            border-left: 4px solid var(--gold);
+            padding-left: 1rem;
+        }
+
+        h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--shadow);
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: rgba(255,255,255,0.7);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid var(--border);
+        }
+
+        th, td {
+            padding: 0.8rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--shadow) 0%, #5a4235 100%);
+            color: var(--parchment);
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        tr:nth-child(even) {
+            background: rgba(232, 227, 211, 0.5);
+        }
+
+        tr:hover {
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: help;
+            color: var(--blood-red);
+            text-decoration: underline dotted;
+            font-weight: 600;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background: var(--ink);
+            color: var(--parchment);
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid var(--gold);
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--ink) transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .cross-ref {
+            color: var(--blood-red);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px dotted var(--blood-red);
+            transition: all 0.3s ease;
+        }
+
+        .cross-ref:hover {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.3);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-menu {
+            background: var(--shadow);
+            color: var(--parchment);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .nav-menu h3 {
+            color: var(--gold);
+            border: none;
+            margin: 0 0 1rem 0;
+            padding: 0;
+        }
+
+        .nav-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .nav-links a {
+            color: var(--parchment);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background: var(--gold);
+            color: var(--ink);
+            border-color: var(--gold);
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+            padding: 1rem;
+            border-left: 4px solid var(--gold);
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        code {
+            background: rgba(0,0,0,0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .dice {
+            color: var(--blood-red);
+            font-weight: 700;
+            font-family: 'Cinzel', serif;
+        }
+
+        hr {
+            border: none;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗡️ SHADOWDARK RPG 🗡️<br>Complete Reference</h1>
+        
+        <nav class="nav-menu">
+            <h3>Quick Navigation</h3>
+            <div class="nav-links">
+                <a href="#core-mechanics">Core Mechanics</a>
+                <a href="#combat">Combat</a>
+                <a href="#stealth">Stealth & Detection</a>
+                <a href="#experience">Experience & Treasure</a>
+                <a href="#recovery">Recovery & Rest</a>
+                <a href="#travel">Travel & Downtime</a>
+                <a href="#exploration">Exploration</a>
+                <a href="#critical-rules">Critical Rules</a>
+            </div>
+        </nav>
+
+        <section id="core-mechanics" class="section">
+            <h2>⚔️ CORE MECHANICS & COMBAT</h2>
+
+            <h3 id="core-mechanics-table">Core Mechanics</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Roll Type</th>
+                        <th>Formula</th>
+                        <th>When Used</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Checks/Saves</strong></td>
+                        <td><span class="dice">d20</span> + stat mod vs <span class="tooltip">DC<span class="tooltiptext">Difficulty Class - the target number you need to meet or exceed</span></span></td>
+                        <td>Most common - any risky action, resisting effects</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Attack Rolls</strong></td>
+                        <td><span class="dice">d20</span> + STR/DEX + bonuses vs <span class="tooltip">AC<span class="tooltiptext">Armor Class - the target number needed to hit</span></span></td>
+                        <td><a href="#combat" class="cross-ref">Combat</a> hits</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Damage</strong></td>
+                        <td>Weapon/spell dice + mods</td>
+                        <td>After successful attacks/spells</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Spellcasting</strong></td>
+                        <td><span class="dice">d20</span> + INT/WIS vs Spell DC (10+tier)</td>
+                        <td>Casting spells</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Initiative</strong></td>
+                        <td><span class="dice">d20</span> + DEX</td>
+                        <td><a href="#combat-setup" class="cross-ref">Combat</a> start</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Difficulty Classes</h4>
+            <div class="highlight">
+                <strong>DC 9</strong> Easy | <strong>DC 12</strong> Normal | <strong>DC 15</strong> Hard | <strong>DC 18</strong> Extreme
+            </div>
+
+            <h4>Modifiers</h4>
+            <ul>
+                <li><strong><span class="tooltip">Advantage<span class="tooltiptext">Roll 2d20 and take the higher result</span></span>:</strong> Roll <span class="dice">2d20</span>, take higher</li>
+                <li><strong><span class="tooltip">Disadvantage<span class="tooltiptext">Roll 2d20 and take the lower result</span></span>:</strong> Roll <span class="dice">2d20</span>, take lower</li>
+                <li><strong><span class="tooltip">Luck Token<span class="tooltiptext">Special resource that lets you reroll any die</span></span>:</strong> Reroll any die (accept new result)</li>
+            </ul>
+
+            <h4>Common Stat Uses</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stat</th>
+                        <th>Common Uses</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>STR</strong></td>
+                        <td>Smash doors, bend bars, lift heavy objects, stop spinning helm</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DEX</strong></td>
+                        <td>Dodge traps, disable tripwires, climb walls, <a href="#stealth" class="cross-ref">sleight of hand</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CON</strong></td>
+                        <td>Hold breath, withstand pain, resist poison</td>
+                    </tr>
+                    <tr>
+                        <td><strong>INT</strong></td>
+                        <td>First aid (DC 15), recall paths, find food/water sources</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WIS</strong></td>
+                        <td>Spot enemies, determine noise direction, listen through doors</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CHA</strong></td>
+                        <td>Ventriloquism, disguises, rally terrified allies</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><em>INT = knowledge/logic, WIS = sensory/instinct</em></p>
+        </section>
+
+        <section id="combat" class="section">
+            <h3 id="combat-setup">Combat Flow</h3>
+
+            <h4>1. Combat Setup</h4>
+            <ol>
+                <li><strong>Surprise Check</strong> (if applicable)
+                    <ul>
+                        <li>Hidden creature rolls <a href="#stealth" class="cross-ref">DEX check</a></li>
+                        <li>If beats passive detection → Free turn before <span class="tooltip">initiative<span class="tooltiptext">The order in which characters act in combat</span></span></li>
+                        <li><strong>Free Turn:</strong> One action + move, attacks have <span class="tooltip">advantage<span class="tooltiptext">Roll 2d20, take higher</span></span>, no reactions allowed</li>
+                    </ul>
+                </li>
+                <li><strong>Initiative:</strong> <span class="dice">d20</span> + DEX (highest first)</li>
+            </ol>
+
+            <h4>2. Turn Structure</h4>
+            <p>Each turn: <strong>Check conditions → Choose action + movement → Resolve</strong></p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Movement Options</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Action + Move</td>
+                        <td>One action + move "near" (~30 ft), can split</td>
+                    </tr>
+                    <tr>
+                        <td>Double Move</td>
+                        <td>Forgo action, move "near" twice (~60 ft)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>3. Combat Actions</h4>
+
+            <h5><strong>Attack (Melee/Ranged)</strong></h5>
+            <ul>
+                <li>Roll: <span class="dice">d20</span> + STR/DEX + bonuses vs AC</li>
+                <li><strong>Nat 20:</strong> Auto-hit, double damage dice</li>
+                <li><strong>Nat 1:</strong> Auto-miss, possible consequence</li>
+                <li>Damage: Weapon dice + STR/DEX + bonuses</li>
+            </ul>
+
+            <h5><strong>Spellcasting</strong></h5>
+            <ul>
+                <li>Roll: <span class="dice">d20</span> + INT/WIS vs Spell DC (10 + tier)</li>
+                <li><strong>Nat 20:</strong> Auto-success, double one numerical effect</li>
+                <li><strong>Nat 1:</strong> Fail + mishap, spell unavailable until <a href="#recovery" class="cross-ref">rest</a></li>
+            </ul>
+
+            <h5><strong>Other:</strong></h5>
+            <p>Use item, help ally, improvise (GM sets DC)</p>
+
+            <h4>4. End of Round</h4>
+            <ol>
+                <li><strong><a href="#dying" class="cross-ref">Dying Check</a>:</strong> <span class="tooltip">0 HP<span class="tooltiptext">Hit Points - when reduced to 0, you become unconscious and dying</span></span> = unconscious, dies next turn unless healed</li>
+                <li><strong>Monster Morale:</strong> Half HP → DC 15 WIS or flee/surrender</li>
+                <li><strong><a href="#light-darkness" class="cross-ref">Light Timer</a>:</strong> Real-time countdown continues</li>
+                <li>Return to initiative order</li>
+            </ol>
+        </section>
+
+        <hr>
+
+        <section id="stealth" class="section">
+            <h2>🌙 STEALTH, XP & RECOVERY</h2>
+
+            <h3>Stealth & Detection</h3>
+
+            <h4>Hiding/Sneaking</h4>
+            <ul>
+                <li><strong>When:</strong> Risky stealth situations</li>
+                <li><strong>Roll:</strong> <span class="dice">d20</span> + DEX vs DC (typically 12-15)</li>
+                <li><strong>Modifiers:</strong>
+                    <ul>
+                        <li>Total darkness: Easier/automatic if unobserved</li>
+                        <li>Cover/shadows: <span class="tooltip">Advantage<span class="tooltiptext">Roll 2d20, take higher</span></span></li>
+                        <li>Bright light: Harder/impossible</li>
+                        <li>Noisy environment: Higher DC</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4>Detection</h4>
+            <ul>
+                <li><strong>Active Search:</strong> Describe searching specific area → Auto-find if correct spot</li>
+                <li><strong>Passive Detection:</strong> <span class="dice">d20</span> + WIS vs DC (when not actively searching)</li>
+                <li><strong>Modifiers:</strong>
+                    <ul>
+                        <li>Total darkness: <span class="tooltip">Disadvantage<span class="tooltiptext">Roll 2d20, take lower</span></span> or impossible</li>
+                        <li>Moving/noisy target: <span class="tooltip">Advantage<span class="tooltiptext">Roll 2d20, take higher</span></span></li>
+                        <li>Distracted searcher: <span class="tooltip">Disadvantage<span class="tooltiptext">Roll 2d20, take lower</span></span></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section id="experience" class="section">
+            <h3>Experience & Treasure</h3>
+
+            <h4>XP System</h4>
+            <p>Characters gain XP from valuable treasures and boons earned during adventures. Each PC gets the full XP value of each treasure. When PCs level up, XP resets to zero.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Quality</th>
+                        <th>XP</th>
+                        <th>Examples</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Poor</strong></td>
+                        <td>0</td>
+                        <td>Bag of silver, used dagger, knucklebone dice</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Normal</strong></td>
+                        <td>1</td>
+                        <td>Bag of gold, gem, fine armor, magic scroll</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fabulous</strong></td>
+                        <td>3</td>
+                        <td>Magic sword, giant diamond, mithral chainmail</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Legendary</strong></td>
+                        <td>10</td>
+                        <td>The Staff of Ord, djinni's wish, dragon hoard</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>XP Sources</h4>
+            <ul>
+                <li>Gold and gems</li>
+                <li>Oaths, secrets, and blessings</li>
+                <li>Magic items</li>
+                <li>Meaningful trophies/tokens</li>
+                <li>Clever thinking (award 1 XP for ingenious actions)</li>
+            </ul>
+
+            <h4>Treasure Value Guidelines</h4>
+            <p>Per treasure find, each group should gain about <strong>10 gp × average party level</strong> in value:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Party Level</th>
+                        <th>Suggested Value per Find</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Levels 0-3</td>
+                        <td>~20 gp in value</td>
+                    </tr>
+                    <tr>
+                        <td>Levels 4-6</td>
+                        <td>~50 gp in value</td>
+                    </tr>
+                    <tr>
+                        <td>Levels 7-9</td>
+                        <td>~80 gp in value</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><em>Note: XP awards don't need to reflect monetary value - boons and fabled items have intangible worth beyond gold.</em></p>
+        </section>
+
+        <section id="recovery" class="section">
+            <h3>Resting & Recovery</h3>
+
+            <h4>Rest Requirements</h4>
+            <ul>
+                <li><strong>Duration:</strong> 8 hours sleep + consume 1 ration</li>
+                <li><strong>Interruptions:</strong> Each stressful event (<a href="#combat" class="cross-ref">combat</a>, etc.) = DC 12 CON check
+                    <ul>
+                        <li><strong>Failure:</strong> Consume ration, gain no benefit</li>
+                        <li><strong>Success:</strong> Full HP recovery + all stat damage healed + abilities refresh</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4>Campfire Rules</h4>
+            <ul>
+                <li><strong>Create:</strong> Combine 3 torches (can't move once lit)</li>
+                <li><strong>Duration:</strong> 8 hours with character present</li>
+                <li><strong>Range:</strong> Near distance light</li>
+            </ul>
+
+            <h4>Danger Level During Rest</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Environment</th>
+                        <th>Encounter Check Frequency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Unsafe</strong></td>
+                        <td>Every 3 hours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Risky</strong></td>
+                        <td>Every 2 hours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deadly</strong></td>
+                        <td>Every hour</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr>
+
+        <section id="travel" class="section">
+            <h2>🗺️ TRAVEL & DOWNTIME</h2>
+
+            <h3>Overland Travel</h3>
+
+            <h4>Time & Movement</h4>
+            <ul>
+                <li><strong>Travel Limit:</strong> 8 hours/day (CON checks to push further)</li>
+                <li><strong>Hex Size:</strong> 6 miles across</li>
+            </ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Travel Method</th>
+                        <th>Time per Hex</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Walking</td>
+                        <td>4 hours</td>
+                    </tr>
+                    <tr>
+                        <td>Mounted</td>
+                        <td>2 hours</td>
+                    </tr>
+                    <tr>
+                        <td>Sailing</td>
+                        <td>1 hour</td>
+                    </tr>
+                    <tr>
+                        <td>Difficult terrain</td>
+                        <td>2× normal</td>
+                    </tr>
+                    <tr>
+                        <td>Arduous terrain</td>
+                        <td>8 hours</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Travel Mechanics</h4>
+            <ul>
+                <li><strong>Navigation:</strong> INT check when exiting unfamiliar hex (failure = random adjacent hex)</li>
+                <li><strong>Light Sources:</strong> Roll <span class="dice">1d6 × 10</span> minutes remaining if needed</li>
+                <li><strong>Food/Water:</strong> Survive 3 days without rations, then 1 CON damage/day (death at 0 CON)</li>
+                <li><strong>Foraging:</strong> 1 ration/day with INT check</li>
+            </ul>
+
+            <h4>Encounter Frequency</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Danger Level</th>
+                        <th>Check Every</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Unsafe</strong></td>
+                        <td>3 hours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Risky</strong></td>
+                        <td>2 hours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deadly</strong></td>
+                        <td>1 hour</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Downtime Activities</h3>
+
+            <h4>Learning New Skills</h4>
+            <ul>
+                <li><strong>Requirements:</strong> Find capable instructor</li>
+                <li><strong>Check:</strong> DC 18 INT (reduces by one step each failed attempt)</li>
+                <li><strong>Benefits:</strong> New actions or <span class="tooltip">advantage<span class="tooltiptext">Roll 2d20, take higher</span></span> on certain checks</li>
+                <li><strong>Examples:</strong> Languages, specialized riding, auxiliary skills</li>
+            </ul>
+
+            <h4>Carousing System</h4>
+            <p>Convert gold to XP and gain allies/enemies. Each participant pays event cost, rolls <span class="dice">1d8</span> + event bonus.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cost</th>
+                        <th>Event Description</th>
+                        <th>Bonus</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>30 gp</td>
+                        <td>Worthy night of drinking</td>
+                        <td>+0</td>
+                    </tr>
+                    <tr>
+                        <td>100 gp</td>
+                        <td>Full day/night of revelry</td>
+                        <td>+1</td>
+                    </tr>
+                    <tr>
+                        <td>300 gp</td>
+                        <td>Two days crawling taverns</td>
+                        <td>+2</td>
+                    </tr>
+                    <tr>
+                        <td>600 gp</td>
+                        <td>Three-day fine dining/gambling</td>
+                        <td>+3</td>
+                    </tr>
+                    <tr>
+                        <td>900 gp</td>
+                        <td>Weeklong bender</td>
+                        <td>+4</td>
+                    </tr>
+                    <tr>
+                        <td>1,200 gp</td>
+                        <td>Ten-day fete (takes over town)</td>
+                        <td>+5</td>
+                    </tr>
+                    <tr>
+                        <td>1,800 gp</td>
+                        <td>Two-week legendary debauchery</td>
+                        <td>+6</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Carousing Outcomes (<span class="dice">1d8</span> + Bonus)</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Roll</th>
+                        <th>Result</th>
+                        <th>XP</th>
+                        <th>Other Effects</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Wake up in bed</td>
+                        <td>2</td>
+                        <td>None</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Stocks 1d4 days, fine 20% wealth</td>
+                        <td>2</td>
+                        <td>Building fire</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Gutter, spent 15% wealth</td>
+                        <td>3</td>
+                        <td>None</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Donated 10% to priest</td>
+                        <td>3</td>
+                        <td>Priest ally</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Fined 10%, tavern brawl</td>
+                        <td>3</td>
+                        <td>Barred from tavern</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Thieves' Guild took 5%</td>
+                        <td>4</td>
+                        <td>None</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Led insulting noble song</td>
+                        <td>4</td>
+                        <td>Famous bard ally</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Knife-throwing demo</td>
+                        <td>4</td>
+                        <td><a href="#core-mechanics" class="cross-ref">Luck token</a></td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Beat rival crawler</td>
+                        <td>5</td>
+                        <td>NPC ally or enemy</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Reflected wizard's spell</td>
+                        <td>5</td>
+                        <td><a href="#core-mechanics" class="cross-ref">Luck token</a></td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>Pranked corrupt merchant</td>
+                        <td>5</td>
+                        <td>City Watch ally</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>Beat noble in drinking contest</td>
+                        <td>5</td>
+                        <td>Noble owes debt</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>Heist sorcerer's tower</td>
+                        <td>6</td>
+                        <td>80-100 treasure item</td>
+                    </tr>
+                    <tr>
+                        <td>14+</td>
+                        <td>Stole ruler's heirloom</td>
+                        <td>6</td>
+                        <td>90-100 treasure item (if escape)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr>
+
+        <section id="exploration" class="section">
+            <h2>🔍 EXPLORATION & CRITICAL RULES</h2>
+
+            <h3>Exploration & Solo Play</h3>
+
+            <h4>Random Encounters</h4>
+
+            <p><strong>Purpose:</strong> Maintain time pressure - lingering = more risk</p>
+
+            <p><strong>Check Frequency:</strong></p>
+            <ul>
+                <li><strong>Dungeon Crawling:</strong> Every 3/2/1 rounds (Unsafe/Risky/Deadly)</li>
+                <li><strong><a href="#travel" class="cross-ref">Overland Travel</a>:</strong> Every 3/2/1 hours (Unsafe/Risky/Deadly)</li>
+                <li><strong>Trigger:</strong> Roll <span class="dice">1d6</span>, encounter on 1 (also check for loud disturbances)</li>
+            </ul>
+
+            <p><strong>Encounter Setup:</strong></p>
+            <ul>
+                <li><strong>Starting Distance:</strong> Roll <span class="dice">1d6</span> → 1=Close, 2-4=Near, 5-6=Far</li>
+                <li><strong>Activity:</strong> Roll <span class="dice">2d6</span> → 2-4=Hunting, 5-6=Eating, 7-8=Building, 9-10=Socializing, 11=Guarding, 12=Sleeping</li>
+                <li><strong>Reaction:</strong> Roll <span class="dice">2d6</span> + CHA mod → 0-6=Hostile, 7-8=Suspicious, 9=Neutral, 10-11=Curious, 12+=Friendly</li>
+                <li><strong>Treasure:</strong> 50% chance of no treasure</li>
+            </ul>
+
+            <h4>SoloDark Oracle System</h4>
+            <ul>
+                <li><strong>Yes/No Questions:</strong> <span class="dice">d20</span> oracle roll</li>
+                <li><strong>Story Prompts:</strong> <span class="dice">d100</span> for Verb + Noun combinations</li>
+                <li>Use frequently for solo narrative generation</li>
+            </ul>
+        </section>
+
+        <section id="critical-rules" class="section">
+            <h3>Critical Rules</h3>
+
+            <h4 id="light-darkness">Light & Darkness</h4>
+            <ul>
+                <li><strong>Total Darkness:</strong> <span class="tooltip">Disadvantage<span class="tooltiptext">Roll 2d20, take lower</span></span> on most tasks</li>
+                <li><strong>Dark-adapted monsters:</strong> Attack normally in darkness</li>
+                <li><strong>Light sources:</strong> Tick down in real-time during play</li>
+            </ul>
+
+            <h4 id="dying">Dying & Stabilization</h4>
+            <ul>
+                <li><strong><span class="tooltip">0 HP<span class="tooltiptext">Hit Points - your life force and ability to continue fighting</span></span>:</strong> Unconscious and dying</li>
+                <li><strong>Stabilize:</strong> Action + DC 15 INT check by ally</li>
+                <li><strong>Death:</strong> Occurs at start of dying character's next turn</li>
+            </ul>
+
+            <h4>Special Situations</h4>
+            <ul>
+                <li><strong>Monster abilities:</strong> May require <a href="#core-mechanics" class="cross-ref">saving throws</a></li>
+                <li><strong>Player creativity:</strong> GM should reward clever descriptions over dice rolls</li>
+                <li><strong>GM discretion:</strong> Fast and fun over strict rule adherence</li>
+            </ul>
+
+            <div class="highlight">
+                <strong>Remember:</strong> Shadowdark emphasizes quick resolution, narrative flow, and the constant tension of dwindling resources. When in doubt, make a ruling that keeps the game moving and the players engaged with the dangers lurking in the shadows.
+            </div>
+        </section>
+
+        <footer style="text-align: center; margin-top: 3rem; padding: 2rem; border-top: 3px double var(--border); color: var(--shadow); font-style: italic;">
+            <p>May your torches burn bright and your blades stay sharp in the endless darkness...</p>
+            <p style="font-size: 0.9rem; margin-top: 1rem;">⚔️ Shadowdark RPG Reference ⚔️</p>
+        </footer>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add subtle hover effects to tables
+        document.querySelectorAll('table tr').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.01)';
+                this.style.transition = 'transform 0.2s ease';
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // Add click-to-copy functionality for dice notation
+        document.querySelectorAll('.dice').forEach(dice => {
+            dice.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent).then(() => {
+                    const original = this.textContent;
+                    this.textContent = 'Copied!';
+                    this.style.color = 'var(--gold)';
+                    setTimeout(() => {
+                        this.textContent = original;
+                        this.style.color = 'var(--blood-red)';
+                    }, 1000);
+                });
+            });
+            
+            dice.style.cursor = 'pointer';
+            dice.title = 'Click to copy dice notation';
+        });
+
+        // Collapsible sections for mobile
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('h2').forEach(header => {
+                header.addEventListener('click', function() {
+                    const section = this.parentElement;
+                    const content = section.querySelector('h3, h4, table, ul, ol, p');
+                    if (content) {
+                        section.classList.toggle('collapsed');
+                        if (section.classList.contains('collapsed')) {
+                            Array.from(section.children).forEach(child => {
+                                if (child !== this) {
+                                    child.style.display = 'none';
+                                }
+                            });
+                        } else {
+                            Array.from(section.children).forEach(child => {
+                                child.style.display = '';
+                            });
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
