@@ -71,3 +71,17 @@ Every judgment below is reversible. No assumption changes the source books thems
 - **Assumption:** Proceed with the Markdown sources and do not create BLOCKER.md.
 - **Reasoning:** All three Markdown source files were retrieved and parsed as readable UTF-8.
 - **Reversibility:** If a later revision is missing or corrupt, create a blocker for that revision rather than filling its content from memory.
+
+## A11 — SoloDark is an optional historical solo aid, not a new expansion layer
+
+- **Ambiguity:** SoloDark V1 predates the 2026 Western Reaches books in the repository. The user has not yet received all physical/Kickstarter PDFs, so it is unknown whether other later materials clarify or replace any solo procedures.
+- **Assumption:** Treat SoloDark as an optional solo-play aid for the original Shadowdark engine. Evaluate only the current repository sources `src/01/01.md`, `src/02/02.md`, `src/03/03.md`, and `src/solo/SoloDark_V1_(PDF).md`. Limit the review to solo-relevant rules and direct interactions; do not re-index all expansion content.
+- **Reasoning:** SoloDark's source carries a 2023 copyright notice; the two Western Reaches books carry 2026 copyright notices. The supplied 02/03 text does not explicitly adopt or supersede SoloDark. The exact remaining Kickstarter source set is not available in this repository pass.
+- **Reversibility:** When additional PDFs arrive, search them for solo/Oracle/initiative/light/luck procedures and update `src/solo/README.md`. If a later source expressly revises SoloDark, record that as an override and preserve this review as the earlier-source baseline.
+
+## A12 — Oracle-style tools are treated as replaceable implementations
+
+- **Ambiguity:** SoloDark presents a specific d20 Oracle and d100 verb+noun Prompt table, but solo play could use other uncertainty-resolution aids.
+- **Assumption:** Treat the Oracle/Prompt procedure as the published implementation, while documenting tarot, other oracles, random tables, and scripts only as possible replacements at the interface level. Do not attribute those alternatives to SoloDark itself.
+- **Reasoning:** This separates the general job of replacing missing GM judgment from the particular random tables used by this booklet.
+- **Reversibility:** Keep the SoloDark tables unchanged as one backend, or replace the implementation without changing Shadowdark's core checks, combat, travel, or resource rules.
