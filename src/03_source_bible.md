@@ -1410,16 +1410,16 @@ The six player factions in 02 are not assumed to be identical to every similarly
 | TENETS | 02 | option | p. 203 | Player-facing ancestry, class, background, spell, deity, patron, or character option; extends capabilities through the existing Shadowdark engine. | adaptable | — |
 | TERRAIN IN THE REACHES | 02 | rule | p. 225 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
 | TERRAIN TYPES | 02 | rule | p. 225 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
-| The Bards | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | — |
-| The Jeweled Eye | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | — |
+| The Bards | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | 03, p. 18 (The Bards; Bardic College; Master Poet Yeothin) |
+| The Jeweled Eye | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | 03, pp. 19–20 (Alkesh; The Suq; regional arcane/secretive powers; no same-named GM faction) |
 | The Lost | 02 | option | p. 201 | Player-facing ancestry, class, background, spell, deity, patron, or character option; extends capabilities through the existing Shadowdark engine. | adaptable | — |
 | The Reaches are ancient. | 02 | rule | p. 11 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
-| The Scarlet Bones | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | — |
-| The Society | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | — |
-| The Torchbearers | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | — |
+| The Scarlet Bones | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | 03, pp. 59–64, 69–70 (sea/coast encounter and regional material; no same-named GM faction) |
+| The Society | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | 03, pp. 17–18 (Thieves' Guild, House of Seren, The Shroud; related networks, not assumed identical) |
+| The Torchbearers | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | 03, pp. 30–36, 67–83 (sandbox, safe-haven, rumor, and keyed-site campaign support) |
 | The Western Keaches will be shaped by your hands. | 02 | rule | p. 5 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
 | THE WILLOWMAN BOONS | 02 | option | p. 205 | Player-facing ancestry, class, background, spell, deity, patron, or character option; extends capabilities through the existing Shadowdark engine. | adaptable | — |
-| The Wolves of Lydonia | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | — |
+| The Wolves of Lydonia | 02 | faction | p. 89 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | 03, pp. 25–26, 67–70 (Wolves of Lydonia; King Saren; Lydonia and Sablewood) |
 | There are faraway lands. | 02 | rule | p. 11 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
 | THIRD GATE | 02 | option | p. 129 | Player-facing ancestry, class, background, spell, deity, patron, or character option; extends capabilities through the existing Shadowdark engine. | adaptable | — |
 | THOR'S THUNDER | 02 | option | p. 147 | Player-facing ancestry, class, background, spell, deity, patron, or character option; extends capabilities through the existing Shadowdark engine. | adaptable | — |
@@ -1797,7 +1797,7 @@ The six player factions in 02 are not assumed to be identical to every similarly
 | HORSE TRAINER | 03 | rule | p. 152 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
 | HORSE, PRIZED | 03 | creature | p. 282 | Creature/stat-block entry; provides an encounter unit, its identifying traits, and where applicable AC, HP, attacks, movement, level, morale, or special abilities. | adaptable | — |
 | HORSE, WAR | 03 | creature | p. 282 | Creature/stat-block entry; provides an encounter unit, its identifying traits, and where applicable AC, HP, attacks, movement, level, morale, or special abilities. | adaptable | — |
-| House of Seren | 03 | location | p. 18 | Named city-state or notable-site anchor; supports local navigation, encounters, law, factions, commerce, and adventure hooks. | adaptable | — |
+| House of Seren | 03 | location | p. 18 | Named city-state or notable-site anchor; supports local navigation, encounters, law, factions, commerce, and adventure hooks. | adaptable | 02, pp. 97–98 (related criminal network; not assumed identical) |
 | HOUSE OF SEREN | 03 | location | p. 266 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | HOUSE OF SEREN (N) | 03 | faction | p. 255 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | — |
 | HOWLING CAVES | 03 | rule | p. 125 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
@@ -1937,7 +1937,7 @@ The six player factions in 02 are not assumed to be identical to every similarly
 | Morgrim's Mines | 03 | location | p. 22 | Named city-state or notable-site anchor; supports local navigation, encounters, law, factions, commerce, and adventure hooks. | adaptable | — |
 | MORGRIM'S TOMB | 03 | location | p. 201 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | MORZO MOTH | 03 | creature | p. 282 | Creature/stat-block entry; provides an encounter unit, its identifying traits, and where applicable AC, HP, attacks, movement, level, morale, or special abilities. | adaptable | — |
-| Morzomotha | 03 | rule | p. 175 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
+| Morzomotha | 03 | location | p. 175 | Named underground region/realm in the Western Reaches; anchors exploration, routes, hazards, and keyed sites. | adaptable | — |
 | MORZOMOTHA | 03 | location | p. 67 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | MORZOMOTHA | 03 | location | p. 71 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | MOSSY MENHIRS | 03 | rule | p. 133 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
@@ -2172,7 +2172,7 @@ The six player factions in 02 are not assumed to be identical to every similarly
 | TERRAIN TYPES | 03 | creature | p. 282 | Creature/stat-block entry; provides an encounter unit, its identifying traits, and where applicable AC, HP, attacks, movement, level, morale, or special abilities. | adaptable | — |
 | THE ARMOR | 03 | location | p. 199 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | The Ashen Ones | 03 | faction | p. 24 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | — |
-| The Bards | 03 | faction | p. 18 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | — |
+| The Bards | 03 | faction | p. 18 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | 02, pp. 91–92 (player faction) |
 | THE BEND | 03 | location | p. 278 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | THE BILGE POT | 03 | location | p. 265 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | THE BIRDCAGE | 03 | location | p. 266 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
@@ -2238,13 +2238,13 @@ The six player factions in 02 are not assumed to be identical to every similarly
 | THE ROWERS (L) | 03 | faction | p. 257 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | — |
 | THE ROYAL JEWELER | 03 | location | p. 267 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | THE RUSTY NAIL | 03 | location | p. 277 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
-| THE SCOURGE | 03 | rule | p. 127 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
+| THE SCOURGE | 03 | location | p. 127 | Numbered hex-key entry for a location/lair; anchors the dragon encounter, local hazards, and treasure site. | adaptable | — |
 | THE SCOURGE | 03 | creature | p. 282 | Creature/stat-block entry; provides an encounter unit, its identifying traits, and where applicable AC, HP, attacks, movement, level, morale, or special abilities. | adaptable | — |
 | The Seekers | 03 | faction | p. 22 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | — |
 | The Shadowdark | 03 | location | p. 71 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | THE SHADOWDARK | 03 | rule | p. 13 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
 | The Shar | 03 | faction | p. 20 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | — |
-| The Shroud | 03 | faction | p. 18 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | — |
+| The Shroud | 03 | faction | p. 18 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | 02, pp. 97–98 (related criminal network; not assumed identical) |
 | THE SHROUD (C) | 03 | faction | p. 256 | Organization entry; use its mission, leadership, bylaws, allies/rivals, local presence, and benefits or GM-facing hooks. | adaptable | — |
 | THE SILK LION | 03 | location | p. 270 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | THE SLUMBERER | 03 | location | p. 88 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
@@ -2328,7 +2328,7 @@ The six player factions in 02 are not assumed to be identical to every similarly
 | Wizardly Arts Training With | 03 | rule | p. 118 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
 | WODENSHIRE | 03 | rule | p. 207 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
 | WOLF CAVE | 03 | rule | p. 137 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
-| Wolves of Lydonia | 03 | faction | p. 26 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | — |
+| Wolves of Lydonia | 03 | faction | p. 26 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | 02, pp. 101–102 (player faction) |
 | WOOLLY PEAK | 03 | location | p. 89 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | WORKING DISTRICTS | 03 | location | p. 253 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | WORM FIELDS | 03 | rule | p. 171 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
@@ -2340,7 +2340,66 @@ The six player factions in 02 are not assumed to be identical to every similarly
 | YODELER\ | 03 | location | p. 89 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | ZAMEEK'S CURIOS | 03 | location | p. 268 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | ZUCHOTL | 03 | creature | p. 239 | Creature/stat-block entry; provides an encounter unit, its identifying traits, and where applicable AC, HP, attacks, movement, level, morale, or special abilities. | adaptable | — |
-| ZULARA | 03 | rule | p. 127 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
+| ZULARA | 03 | location | p. 127 | Numbered hex-key entry for the hanging City of Zulara; anchors settlement rules, factions, sites, and encounters. | adaptable | — |
+
+### Additional named entries from the City of Masks map and keyed-site prose
+
+| Name | Book | Type | Page | Function | Adaptability tag | Cross-ref (02↔03) |
+|---|---|---|---:|---|---|---|
+| Anvil Hall | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Ashfall | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Best Defense | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Brak's Bones | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Bywater Barons | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Charity House | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Club Levantis | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Cork & Pestle | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Garrison | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Gedgarrin | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Golden Vault | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| House of Seren | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Madame Morda | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Madeera's Hearth | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Mallin's Forge | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Montmar Castle | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Monveau Theater | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Moonlight | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Norley's Wares | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Pin & Drape | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| River Rats | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Safehouse | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Shieldstone Law | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Bend | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Bilge Pot | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Bird Cage | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Blind Pig | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Bull's Pen | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Cookpot | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Daisy Chain | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Duke's Bridge | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Golden Marmot | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Grand Gate | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Pale Toad | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Red Rat | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Rooks | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Round | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Royal Jeweler | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Rusty Nail | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Silk Lion | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Stones | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Temple of Kytheros | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| The Tough Nut | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Tiborian's | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Tree Grove | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Vanglare House | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| Zameek's Curios | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
+| City of Zulara | 03 | location | p. 123 | Hanging city in the Gilzai Mountains; its settlement practices, priests, thieves' guilds, and sites provide a keyed urban adventure hub. | adaptable | — |
+| The Sickle | 03 | faction | p. 127 | One of the competing thieves' guilds in the City of Zulara; local criminal faction and encounter hook. | adaptable | — |
+| The Claws of Yorg | 03 | faction | p. 127 | One of the competing thieves' guilds in the City of Zulara; local criminal faction and encounter hook. | adaptable | — |
+| Manazusa | 03 | creature | p. 126 | Half-demon master of the Ras-Godai monastery; named adversary/NPC anchoring the assassin training site. | adaptable | — |
+| Omid | 03 | option | p. 127 | Named NPC in the Manticore Nest hex entry; links a local body/treasure clue to a keyed encounter. | adaptable | — |
+| Zaina | 03 | option | p. 127 | Named NPC connected to Omid in the Manticore Nest hex entry; potential clue and local history anchor. | adaptable | — |
+| The Black Lotus | 03 | item | p. 126 | Legendary flower used in the Ras-Godai initiation; key magical and faction resource. | adaptable | — |
 
 ## Coverage notes
 
