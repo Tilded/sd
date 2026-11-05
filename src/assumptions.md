@@ -12,9 +12,9 @@ Every judgment below is reversible. No assumption changes the source books thems
 ## A2 — Page citation source
 
 - **Ambiguity:** Sources contain HTML page anchors and visible page separators; some cross-book printed references do not obviously match anchor numbers.
-- **Assumption:** Cite the explicit page-XX anchor number in the relevant source.
-- **Reasoning:** The task requires using the embedded page markers; anchors are stable and machine-readable.
-- **Reversibility:** Replace the citation numbers using a verified printed-page crosswalk if one is later supplied.
+- **Assumption:** Track the current page using both explicit page-ID anchors and visible page separators of the form {N}----. Cite the page number current at the specific heading or rule text, not the parent section's earlier anchor.
+- **Reasoning:** Some headings have an HTML page-ID anchor; others begin after a visible page separator and otherwise inherit an obsolete parent-page number. Combining both marker forms keeps citations page-specific.
+- **Reversibility:** If the source is re-exported with explicit page-ID anchors on every page, re-run the page parser against that uniform marker format.
 
 ## A3 — Cross-reference pagination
 
