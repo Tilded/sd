@@ -2372,7 +2372,7 @@ The six player factions in 02 are not assumed to be identical to every similarly
 | THE ROYAL JEWELER | 03 | location | p. 267 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
 | The Rusty Nail | 03 | location | p. 251 | City of Masks keyed map site; use for navigation, services, local encounters, NPC placement, and adventure hooks. | adaptable | — |
 | THE RUSTY NAIL | 03 | location | p. 277 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
-| THE SCOURGE | 03 | rule | p. 127 | Procedure, table, generator, or GM tool; record its trigger, inputs, cadence, resolution, state change, and consequences. | adaptable | — |
+| THE SCOURGE | 03 | location | p. 127 | Numbered hex-key entry for a location/lair; anchors the dragon encounter, local hazards, and treasure site. | adaptable | — |
 | THE SCOURGE | 03 | creature | p. 304 | Creature/stat-block entry; provides an encounter unit, identifying traits, and where applicable AC, HP, attacks, movement, level, morale, or special abilities. | adaptable | — |
 | The Seekers | 03 | faction | p. 22 | GM-facing city-state power group; defines local authority, missions, allies, threats, or faction conflict. | adaptable | — |
 | The Shadowdark | 03 | location | p. 71 | Geographic, settlement, district, hex, or keyed-site anchor; supports navigation, encounters, factions, rumors, and adventure placement. | adaptable | — |
