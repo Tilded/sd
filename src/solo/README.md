@@ -141,7 +141,7 @@ The core book already includes optional Modes of Play. SoloDark overlaps with so
 |---|---|---|
 | Chaos Mode | Reroll initiative at the start of every combat round. (01, p. 114) | Compatible. SoloDark specifies that the initiative rolls are group initiative. Reroll once per side each round. |
 | Blitz Mode | Light timers last 30 minutes. (01, p. 114) | Alternative light clock. For SoloDark, use its 10-round timer instead; do not apply both durations. |
-| Pulp Mode | No maximum luck tokens; start each session with 1d4 tokens; tokens can also turn hits into critical hits, grant extra actions, or force a GM reroll. (01, p. 114) | Incompatible with SoloDark's party-size cap and its specified luck use. Treat Pulp Mode as a different optional luck package, not an addition to SoloDark. |
+| Pulp Mode | No maximum luck tokens; start each session with 1d4 tokens; tokens can also turn hits into critical hits, grant extra actions, or force a GM reroll. (01, p. 114) | Incompatible with SoloDark's party-size cap and its specified luck use. Its “force the GM to reroll” option also has no separate GM target when one person is both player and GM. Treat Pulp Mode as a different optional luck package, not an addition to SoloDark. |
 | Western Reaches Hard Luck Mode | No spending luck on critical failures or effects that generate luck. (03, p. 29) | Compatible as an added restriction. Apply it alongside SoloDark's ban on rerolling Oracle checks and talent rolls. |
 
 ## 6. A limited solo Reaches play loop
