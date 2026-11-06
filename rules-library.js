@@ -117,14 +117,14 @@ async function writeCache(docs){
  });
 }
 class RuleSourceLibrary{
- constructor(){this.status="not-loaded";this.documents=[];this.chunks=[];this.error="";this.origin="";this.ready=false;}
+ constructor(){this.status="not-loaded";this.documents=[];this.chunks=[];this.error="";this.origin="";this.ready=false;this.cacheWarning="";}
  activate(docs,origin){
   const byId=new Map(docs.map(x=>[x.id,x]));
   if(!SOURCES.every(x=>byId.has(x.id))){this.status="incomplete";this.documents=docs;this.chunks=[];this.ready=false;this.error="All three source books are required.";return false;}
   this.documents=SOURCES.map(x=>byId.get(x.id));this.chunks=this.documents.flatMap(parseDocument);
   this.status="ready";this.ready=true;this.error="";this.origin=origin;return true;
  }
- summary(){return {status:this.status,error:this.error,origin:this.origin,ready:this.ready,documentCount:this.documents.length,chunkCount:this.chunks.length};}
+ summary(){return {status:this.status,error:this.error,origin:this.origin,ready:this.ready,documentCount:this.documents.length,chunkCount:this.chunks.length,cacheWarning:this.cacheWarning};}
  async loadProjectFolder(){
   if(location.protocol==="file:")throw Error("Direct file mode cannot fetch sibling Markdown files. Import 01.md, 02.md, and 03.md instead.");
   const docs=[];
@@ -133,12 +133,14 @@ class RuleSourceLibrary{
    if(!response.ok)throw Error("Could not load "+source.path+" (HTTP "+response.status+")");
    docs.push(validateDocument(source.id,await response.text()));
   }
-  await writeCache(docs);this.activate(docs,"project folder");return true;
+  try{await writeCache(docs);this.cacheWarning="";}catch(error){this.cacheWarning="Browser storage unavailable; source books remain loaded until this page closes. "+error.message;}
+  this.activate(docs,"project folder");return true;
  }
  async initialize(force=false){
   this.status="loading";this.ready=false;
   try{
-   const cache=await readCache(),byId=new Map(cache.filter(x=>x.revision===DATA_REVISION).map(x=>[x.id,x]));
+   let cache=[];try{cache=await readCache();}catch(error){this.cacheWarning="Browser storage unavailable: "+error.message;}
+   const byId=new Map(cache.filter(x=>x.revision===DATA_REVISION).map(x=>[x.id,x]));
    if(!force&&SOURCES.every(x=>byId.has(x.id))){this.activate([...byId.values()],"IndexedDB cache");return this.summary();}
    try{await this.loadProjectFolder();return this.summary();}
    catch(fetchError){
@@ -156,7 +158,8 @@ class RuleSourceLibrary{
   }
   const docs=SOURCES.map(x=>byId.get(x.id)).filter(Boolean);
   if(docs.length!==3)throw Error("Select the three source files named 01.md, 02.md, and 03.md. Found "+docs.length+" of 3.");
-  await writeCache(docs);this.activate(docs,"imported local files");return this.summary();
+  try{await writeCache(docs);this.cacheWarning="";}catch(error){this.cacheWarning="Browser storage unavailable; source books remain loaded until this page closes. "+error.message;}
+  this.activate(docs,"imported local files");return this.summary();
  }
  search(query,isReaches=false,limit=5){
   if(!this.ready||!this.chunks.length)return [];
@@ -172,9 +175,9 @@ class RuleSourceLibrary{
     if(chunk.title.toLowerCase().includes(term))score+=4*weight;
    }
    if(score<=0)continue;
-   if(chunk.book==="01")score*=isReaches?1.08:1.18;
-   if(chunk.book==="02")score*=isReaches?1.18:0.78;
-   if(chunk.book==="03")score*=isReaches?1.22:0.68;
+   if(chunk.book==="01")score*=isReaches?0.96:1.18;
+   if(chunk.book==="02")score*=isReaches?1.30:0.78;
+   if(chunk.book==="03")score*=isReaches?1.40:0.68;
    const phrase=String(query||"").toLowerCase().trim();
    if(phrase.length>5&&chunk.searchText.includes(phrase))score+=8;
    ranked.push({chunk,score});
