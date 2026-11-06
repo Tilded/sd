@@ -107,7 +107,7 @@ async function readCache(){
  });
 }
 async function writeCache(docs){
- const db=await openDatabase();if(!db)return false;
+ const db=await openDatabase();if(!db)throw Error("IndexedDB is unavailable in this browser");
  return new Promise((resolve,reject)=>{
   const tx=db.transaction("documents","readwrite"),store=tx.objectStore("documents");
   docs.forEach(doc=>store.put(doc));
