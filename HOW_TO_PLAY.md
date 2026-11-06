@@ -26,7 +26,7 @@ A ten-step guide for someone who would rather play the game than learn web devel
 
 9. **Save or move your campaign.** **Save** writes the current campaign to this browser. **Load** restores that saved campaign. **Export** downloads a JSON backup. **Import** accepts a JSON export pasted into the import panel. Keep backups somewhere sensible; `localStorage` is not a backup strategy, despite humanity's continued attempts to make it one.
 
-10. **Run the Self-Test.** Click **Run Self-Test**. It executes the fixed-dice ten-turn smoke test, the §8 checklist assertions, and the 30-turn background stress checks without making API calls. Results appear in the Debug panel. A healthy build reports **44 PASS / 0 FAIL**.
+10. **Run the Self-Test.** Click **Run Self-Test**. It executes the fixed-dice ten-turn smoke test, the §8 checklist assertions, the 30-turn background stress checks, and the engine-reliability regression checks without making API calls. Results appear in the Debug panel. A healthy build reports **0 FAIL**. The current pass count is shown in the Debug panel because the suite grows as regression checks are added.
 
 ## Approximate API cost
 
