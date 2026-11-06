@@ -230,6 +230,7 @@ class RuleSourceLibrary{
   try{
    this.activate(samples,"test");
    const mishap=this.search("wizard mishap natural 1",false,5).some(x=>x.book==="01"&&x.page===81);
+   const postRollMishap=this.search("cast spell critical failure wizard mishap table roll 4",false,5).some(x=>x.book==="01"&&x.page===81);
    const reaches=this.search("hex travel terrain",true,5).some(x=>x.book==="02"&&x.page===225);
    const gm=this.search("forest encounter table",true,5).some(x=>x.book==="03"&&x.page===54);
    const namedRegionHits=this.search("regional encounter table",true,5,"Sablewood"),sablewoodIndex=namedRegionHits.findIndex(x=>x.book==="03"&&x.page===55),canyonIndex=namedRegionHits.findIndex(x=>x.book==="03"&&x.page===56),namedRegion=sablewoodIndex>=0&&(canyonIndex<0||sablewoodIndex<canyonIndex);
@@ -238,6 +239,7 @@ class RuleSourceLibrary{
    this.status="not-loaded";this.ready=false;const missing=this.promptContext("wizard mishap",false).text.includes("SOURCE LIBRARY STATUS: NOT LOADED");
    return [
     {name:"wizard mishap query retrieves the core source page",pass:mishap},
+    {name:"post-roll critical failure query retrieves the mishap table",pass:postRollMishap},
     {name:"Reaches hex-travel query retrieves the player procedure",pass:reaches},
     {name:"GM encounter query retrieves setting encounter material",pass:gm},
     {name:"named region query favors the matching encounter table",pass:namedRegion},
