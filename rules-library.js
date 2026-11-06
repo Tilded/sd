@@ -120,7 +120,7 @@ class RuleSourceLibrary{
  constructor(){this.status="not-loaded";this.documents=[];this.chunks=[];this.error="";this.origin="";this.ready=false;this.cacheWarning="";}
  activate(docs,origin){
   const byId=new Map(docs.map(x=>[x.id,x]));
-  if(!SOURCES.every(x=>byId.has(x.id))){this.status="incomplete";this.documents=docs;this.chunks=[];this.ready=false;this.error="All three source books are required.";return false;}
+  if(!SOURCES.every(x=>byId.has(x.id))){this.status="incomplete";this.documents=docs;this.chunks=[];this.termDocumentFrequency=new Map();this.ready=false;this.error="All three source books are required.";return false;}
   this.documents=SOURCES.map(x=>byId.get(x.id));this.chunks=this.documents.flatMap(parseDocument);
   this.termDocumentFrequency=new Map();
   for(const chunk of this.chunks)for(const term of new Set(tokens(chunk.searchText)))this.termDocumentFrequency.set(term,(this.termDocumentFrequency.get(term)||0)+1);
@@ -226,7 +226,7 @@ class RuleSourceLibrary{
    {id:"02",label:"Player Guide",content:"{225}----------------\n## Hex Crawling\nTravel across six-mile hexes. Terrain changes the daily travel budget, and the party selects a travel method before moving. Weather and encounters are resolved through the travel procedure.\n{226}----------------\n## Climate\nStormy weather changes foraging. The region and season determine the climate, and harsh climate changes the party ration requirement."},
    {id:"03",label:"Game Master Guide",content:"{54}----------------\n## Forest Encounters\nUse the regional encounter table when the party travels through the forest. Roll the listed die and apply the keyed encounter result; do not substitute a different terrain table.\n{55}----------------\n## Sablewood Encounters\nSablewood encounters use the Sablewood regional encounter table. The table's results are specific to this forest and should not be replaced with canyon or desert results.\n{56}----------------\n## Canyon Encounters\nCanyon encounters use the canyon regional encounter table. The table's results are specific to canyon terrain and should not be used for forest travel."}
   ];
-  const prior={documents:this.documents,chunks:this.chunks,ready:this.ready,status:this.status,error:this.error,origin:this.origin};
+  const prior={documents:this.documents,chunks:this.chunks,termDocumentFrequency:this.termDocumentFrequency,ready:this.ready,status:this.status,error:this.error,origin:this.origin};
   try{
    this.activate(samples,"test");
    const mishap=this.search("wizard mishap natural 1",false,5).some(x=>x.book==="01"&&x.page===81);
@@ -247,7 +247,7 @@ class RuleSourceLibrary{
     {name:"retrieved context stays within the size budget",pass:bounded},
     {name:"missing library is disclosed to the model",pass:missing}
    ];
-  }finally{this.documents=prior.documents;this.chunks=prior.chunks;this.ready=prior.ready;this.status=prior.status;this.error=prior.error;this.origin=prior.origin;}
+  }finally{this.documents=prior.documents;this.chunks=prior.chunks;this.termDocumentFrequency=prior.termDocumentFrequency;this.ready=prior.ready;this.status=prior.status;this.error=prior.error;this.origin=prior.origin;}
  }
 }
 window.RuleSourceLibrary=RuleSourceLibrary;
