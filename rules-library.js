@@ -232,7 +232,7 @@ class RuleSourceLibrary{
    const mishap=this.search("wizard mishap natural 1",false,5).some(x=>x.book==="01"&&x.page===81);
    const reaches=this.search("hex travel terrain",true,5).some(x=>x.book==="02"&&x.page===225);
    const gm=this.search("forest encounter table",true,5).some(x=>x.book==="03"&&x.page===54);
-   const namedRegionHits=this.search("regional encounter table",true,5,"Sablewood"),namedRegion=namedRegionHits.some(x=>x.book==="03"&&x.page===55)&&!namedRegionHits.some(x=>x.book==="03"&&x.page===56);
+   const namedRegionHits=this.search("regional encounter table",true,5,"Sablewood"),sablewoodIndex=namedRegionHits.findIndex(x=>x.book==="03"&&x.page===55),canyonIndex=namedRegionHits.findIndex(x=>x.book==="03"&&x.page===56),namedRegion=sablewoodIndex>=0&&(canyonIndex<0||sablewoodIndex<canyonIndex);
    const context=this.promptContext("wizard mishap",false),grounded=context.text.includes("[01, p. 81")&&context.refs.includes("01, p. 81 — Wizard Mishaps");
    const bounded=context.text.length<=7200;
    this.status="not-loaded";this.ready=false;const missing=this.promptContext("wizard mishap",false).text.includes("SOURCE LIBRARY STATUS: NOT LOADED");
