@@ -180,9 +180,11 @@ class RuleSourceLibrary{
    if(score<=0)continue;
    const titleLower=chunk.title.toLowerCase(),hintTerms=tokens(placeHint).filter(term=>{const frequency=this.termDocumentFrequency.get(term)||0;return frequency>0&&frequency<80;});
    if(hintTerms.length){
-    const placeMatches=hintTerms.filter(term=>chunk.searchText.includes(term)).length;
-    if(placeMatches)score+=8*placeMatches;
-    else if(/encounter|keyed site|master hex key|region/.test(titleLower))score*=0.20;
+    const titlePlaceMatches=hintTerms.filter(term=>titleLower.includes(term)).length;
+    const bodyPlaceMatches=hintTerms.filter(term=>chunk.searchText.includes(term)&&!titleLower.includes(term)).length;
+    if(titlePlaceMatches)score+=18*titlePlaceMatches;
+    if(bodyPlaceMatches)score+=2*bodyPlaceMatches;
+    if(!titlePlaceMatches&&!bodyPlaceMatches&&/encounter|keyed site|master hex key|region/.test(titleLower))score*=0.20;
    }
    // Table-of-contents entries are navigation aids, never rules evidence.
    if(titleLower==="contents"||titleLower.includes("table of contents"))score*=0.08;
@@ -222,7 +224,7 @@ class RuleSourceLibrary{
   const samples=[
    {id:"01",label:"Core Rules",content:"{80}----------------\n## Morale\nEnemies reduced to half their number flee if they fail a DC 15 Wisdom check. Large groups make one check using the leader Wisdom modifier, while a solo enemy checks when it reaches half its hit points.\n{81}----------------\n## Wizard Mishaps\nOn a natural 1, roll on the wizard mishap table for the spell tier. The result may harm the caster, change the spell target, or impose a further restriction. Use the table printed for the caster spell tier."},
    {id:"02",label:"Player Guide",content:"{225}----------------\n## Hex Crawling\nTravel across six-mile hexes. Terrain changes the daily travel budget, and the party selects a travel method before moving. Weather and encounters are resolved through the travel procedure.\n{226}----------------\n## Climate\nStormy weather changes foraging. The region and season determine the climate, and harsh climate changes the party ration requirement."},
-   {id:"03",label:"Game Master Guide",content:"{54}----------------\n## Forest Encounters\nUse the regional encounter table when the party travels through the forest. Roll the listed die and apply the keyed encounter result; do not substitute a different terrain table.\n{55}----------------\n## Sablewood Encounters\nSablewood encounters use the Sablewood regional encounter table. The table's results are specific to this forest and should not be replaced with canyon or desert results.\n{56}----------------\n## Canyon Encounters\nCanyon encounters use the canyon regional encounter table. The table's results are specific to canyon terrain and should not be used for the Sablewood."}
+   {id:"03",label:"Game Master Guide",content:"{54}----------------\n## Forest Encounters\nUse the regional encounter table when the party travels through the forest. Roll the listed die and apply the keyed encounter result; do not substitute a different terrain table.\n{55}----------------\n## Sablewood Encounters\nSablewood encounters use the Sablewood regional encounter table. The table's results are specific to this forest and should not be replaced with canyon or desert results.\n{56}----------------\n## Canyon Encounters\nCanyon encounters use the canyon regional encounter table. The table's results are specific to canyon terrain and should not be used for forest travel."}
   ];
   const prior={documents:this.documents,chunks:this.chunks,ready:this.ready,status:this.status,error:this.error,origin:this.origin};
   try{
