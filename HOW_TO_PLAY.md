@@ -2,9 +2,11 @@
 
 A ten-step guide for someone who would rather play the game than learn web development. Sensible.
 
-1. **Open the app.** Download `index.html` and double-click it. It opens in a modern browser. There is no installer, build step, npm package, or server required. If you are using Replit, create a plain HTML project, upload this file as `index.html`, and open the Preview pane.
+1. **Open the app.** Download the repository ZIP from GitHub (**Code → Download ZIP**) and extract it. Keep `index.html`, `rules-library.js`, and the `src/` folder together. Double-click `index.html` to open it in a modern browser. There is no installer, build step, npm package, or server required. If you are using Replit, upload the project files and the `src/` folder, not just `index.html`, then open the Preview pane.
 
 2. **Start with the sample campaign.** The app opens with *The Bell Under Sablewood*, Rook (fighter), Lysa (thief), and a goblin encounter already loaded. Rook is the player character; Lysa is the first companion. You can rename the campaign in the top bar.
+
+   **Load the Rules Library.** Click **Rules Library** in the top bar. A hosted copy loads the three source books automatically. When opening `index.html` directly from disk, click **Import 3 source files** and select `src/01/01.md`, `src/02/02.md`, and `src/03/03.md`. The library indexes their page markers and caches the files in this browser when IndexedDB is available. You can test searches in the same panel. The DM receives only a small set of relevant passages for each turn, with book and page references.
 
 3. **Get an OpenAI API key.** Sign in at [platform.openai.com](https://platform.openai.com/), open [API keys](https://platform.openai.com/api-keys), and create a new secret key. Copy it when it appears. You generally cannot reveal the full key again later.
 
@@ -26,7 +28,7 @@ A ten-step guide for someone who would rather play the game than learn web devel
 
 9. **Save or move your campaign.** **Save** writes the current campaign to this browser. **Load** restores that saved campaign. **Export** downloads a JSON backup. **Import** accepts a JSON export pasted into the import panel. Keep backups somewhere sensible; `localStorage` is not a backup strategy, despite humanity's continued attempts to make it one.
 
-10. **Run the Self-Test.** Click **Run Self-Test**. It executes the fixed-dice ten-turn smoke test, the §8 checklist assertions, the 30-turn background stress checks, and the engine-reliability regression checks without making API calls. Results appear in the Debug panel. A healthy build reports **0 FAIL**. The current pass count is shown in the Debug panel because the suite grows as regression checks are added.
+10. **Run the Self-Test.** Click **Run Self-Test**. It executes the fixed-dice ten-turn smoke test, the §8 checklist assertions, the 30-turn background stress checks, the engine-reliability checks, and the source-retrieval checks without making API calls. Results appear in the Debug panel. A healthy build reports **0 FAIL**. The current pass count is shown in the Debug panel because the suite grows as regression checks are added.
 
 ## Approximate API cost
 
