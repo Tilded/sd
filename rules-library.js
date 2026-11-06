@@ -182,7 +182,7 @@ class RuleSourceLibrary{
     const titlePlaceMatches=hintTerms.filter(term=>titleLower.includes(term)).length;
     const bodyPlaceMatches=hintTerms.filter(term=>chunk.searchText.includes(term)&&!titleLower.includes(term)).length;
     if(titlePlaceMatches)score+=18*titlePlaceMatches;
-    else if(bodyPlaceMatches)score*=0.08;
+    else if(bodyPlaceMatches)score=Math.min(score,5*bodyPlaceMatches);
     else if(/encounter|keyed site|master hex key|region/.test(titleLower))score*=0.20;
    }
    if(score<=0)continue;
