@@ -131,8 +131,8 @@ function parseJSONOnly(raw){let t=raw.trim().replace(/^```(?:json)?\s*/i,'').rep
 async function parseWithRetry(messages){let raw='';for(let attempt=0;attempt<2;attempt++){raw=await apiCall(messages);rawResponses.push(raw);$('#rawOutput').textContent=rawResponses.slice(-8).join('\n\n--- RESPONSE ---\n\n');try{return parseJSONOnly(raw);}catch(e){messages=[...messages,{role:'assistant',content:raw},{role:'user',content:'Your previous response was not valid JSON. Retry once. Return only the exact required JSON object, with no markdown fences or prose.'}];}}throw Error('JSON parse failed after one retry. Raw response is in Debug.');}
 function toolResultSummary(results){return results.map(x=>({name:x.name,result:x.result?.result??x.result,morale:x.result?.morale?.result??null}));}
 async function playerTurn(intent,actorId=null){if(busy)return;busy=true;$('#sendBtn').disabled=true;const actor=actorId?state.pcs.find(p=>p.id===actorId):activePC();if(!actor){busy=false;return;}logEntry(actor.name,intent,'player');try{if(!actorId&&state.campaign.turn_order.phase==="combat"&&actor.id!==state.pcs[0].id)throw Error("This is a companion turn. Use Ask companion to act.");if(state.campaign.turn_order.phase==="combat"){if(state.campaign.turn_order.active_actor_id!==actor.id)throw Error(`It is not ${actor.name}’s turn.`);if(actor.turn_budget.action_used)throw Error(`${actor.name} has already used their action this turn.`);}else if(state.campaign.turn_order.active_actor_id!==actor.id||actor.turn_budget.action_used){engine.begin_pc_turn(actor.id);}persist();
-const stateForModel=actorId?visibleStateFor(actor.id):modelStateForPlayer();const first=await parseWithRetry([{role:'system',content:SYSTEM_PROMPT+`\n\nRespond with JSON only: {"narration_before":"...","tool_calls":[{"name":"...","args":{}}]}. Use only the exposed kernel tool names. Never state a numeric result unless it is returned by a tool. The host opens PC turns; never call begin_pc_turn. In combat, resolve the active actor, then advance_turn_order once. If an NPC becomes active, resolve its turn using its stat block and advance again. The current visible state follows.`},{role:'user',content:JSON.stringify({intent,actor_id:actor.id,state:stateForModel})}]);if(typeof first.narration_before!=='string'||!Array.isArray(first.tool_calls))throw Error('First response schema invalid');logEntry('DM · Situation',first.narration_before+'\n\n[STATE DELTA]\nNo numeric state change.','dm',[],true);const stateBeforeTools=actorId?visibleStateFor(actor.id):engine.visible_state(),results=[];for(const call of first.tool_calls){const executed=executeTool(call,actorId);results.push(executed);}if(engine.state.campaign.turn_order.phase==="combat"&&engine.state.campaign.turn_order.active_actor_id===actor.id){engine.advance_turn_order();persist();}const stateDelta=diffState(stateBeforeTools,actorId?visibleStateFor(actor.id):engine.visible_state());const second=await parseWithRetry([{role:'system',content:SYSTEM_PROMPT+`\n\nYou are now narrating the results of the deterministic engine. Reply JSON only: {"narration_after":"...","state_notes":"..."}. Do not invent numbers. Use only the supplied tool results and state.`},{role:'user',content:JSON.stringify({intent,results:toolResultSummary(results),state_delta:stateDelta,state:actorId?visibleStateFor(actor.id):modelStateForPlayer()})}]);if(typeof second.narration_after!=='string')throw Error('Second response schema invalid');const rollResults=results.flatMap(x=>{const r=x.result?.result??x.result;return [r,x.result?.morale?.result].filter(Boolean);}).filter(x=>x.roll||x.initiative||x.die!==undefined||x.dice||x.checks||x.encounter_checks||x.rounds||x.rerolled);logEntry('DM · Outcome',`[ROLLS]\n${second.narration_after}${second.state_notes?'\n\n'+second.state_notes:''}\n\n[STATE DELTA]\n${formatDelta(stateDelta)}\n\n[STATE]`,'dm',rollResults,true);addJournal(`${actor.name}: ${intent}\n${second.narration_after}`);if(!actorId&&state.campaign.turn_order.order.length&&state.campaign.turn_order.active_actor_id===actor.id){/* Turn advancement remains an explicit DM/kernel operation. */}}catch(e){logEntry('ENGINE / API ERROR',e.message,'dm');$('#debugPanel').classList.add('show');debugVisible=true;}finally{busy=false;$('#sendBtn').disabled=false;persist();if(state.campaign.turn_order.phase==='combat'&&state.npcs.some(n=>n.id===state.campaign.turn_order.active_actor_id))setTimeout(runNpcTurns,0);}}
-async function runNpcTurns(){if(busy)return;let safety=0;while(state.campaign.turn_order.phase==='combat'&&safety++<10){const id=engine.state.campaign.turn_order.active_actor_id,npc=engine.state.npcs.find(n=>n.id===id);if(!npc)break;if(npc.hp_current<=0||npc.fled){engine.advance_turn_order();persist();continue;}busy=true;$('#sendBtn').disabled=true;try{const before=engine.visible_state();logEntry('DM · NPC TURN',`${npc.name} acts.`,'dm');const first=await parseWithRetry([{role:'system',content:SYSTEM_PROMPT+'\n\nResolve the active NPC turn. Reply JSON only: {"narration_before":"...","tool_calls":[{"name":"...","args":{}}]}. Use the NPC stat block and visible situation. Resolve its legal actions, then advance_turn_order once. Do not invent numeric results.'},{role:'user',content:JSON.stringify({intent:`Resolve ${npc.name}’s turn.`,active_npc_id:id,state:engine.visible_state()})}]);if(typeof first.narration_before!=='string'||!Array.isArray(first.tool_calls))throw Error('NPC turn response schema invalid');logEntry('DM · Situation',first.narration_before+'\n\n[STATE DELTA]\nNo numeric state change.','dm',[],true);const results=[];for(const call of first.tool_calls)results.push(executeTool(call,null));if(engine.state.campaign.turn_order.active_actor_id===id){engine.advance_turn_order();persist();}const delta=diffState(before,engine.visible_state());const second=await parseWithRetry([{role:'system',content:SYSTEM_PROMPT+'\n\nNarrate the completed NPC turn. Reply JSON only: {"narration_after":"...","state_notes":"..."}. Use only the supplied engine results and state.'},{role:'user',content:JSON.stringify({results:toolResultSummary(results),state_delta:delta,state:modelStateForPlayer()})}]);const rr=results.flatMap(x=>{const r=x.result?.result??x.result;return [r,x.result?.morale?.result].filter(Boolean);}).filter(x=>x.roll||x.initiative||x.die!==undefined||x.dice||x.checks||x.encounter_checks||x.rounds||x.rerolled);const nl=String.fromCharCode(10);logEntry('DM · NPC OUTCOME',`[ROLLS]${nl}${second.narration_after}${second.state_notes?nl+nl+second.state_notes:''}${nl}${nl}[STATE DELTA]${nl}${formatDelta(delta)}${nl}${nl}[STATE]`,'dm',rr,true);addJournal(`${npc.name}: ${second.narration_after}`);persist();}catch(e){logEntry('NPC TURN ERROR',e.message,'dm');$('#debugPanel').classList.add('show');break;}finally{busy=false;$('#sendBtn').disabled=false;persist();}}} 
+const stateForModel=actorId?visibleStateFor(actor.id):modelStateForPlayer();const first=await parseWithRetry([{role:'system',content:SYSTEM_PROMPT+`\n\nRespond with JSON only: {"narration_before":"...","tool_calls":[{"name":"...","args":{}}]}. Use only the exposed kernel tool names. Never state a numeric result unless it is returned by a tool. The host opens PC turns; never call begin_pc_turn. In combat, resolve the active actor, then advance_turn_order once. If an NPC becomes active, resolve its turn using its stat block and advance again. The current visible state follows.`},{role:'user',content:JSON.stringify({intent,actor_id:actor.id,state:stateForModel})}]);if(typeof first.narration_before!=='string'||!Array.isArray(first.tool_calls))throw Error('First response schema invalid');logEntry('DM · Situation',first.narration_before+'\n\n[STATE DELTA]\nNo numeric state change.','dm',[],true);const stateBeforeTools=actorId?visibleStateFor(actor.id):engine.visible_state(),results=executeToolBatch(first.tool_calls,actorId,()=>{if(engine.state.campaign.turn_order.phase==="combat"&&engine.state.campaign.turn_order.active_actor_id===actor.id)engine.advance_turn_order();});persist();const stateDelta=diffState(stateBeforeTools,actorId?visibleStateFor(actor.id):engine.visible_state());const second=await parseWithRetry([{role:'system',content:SYSTEM_PROMPT+`\n\nYou are now narrating the results of the deterministic engine. Reply JSON only: {"narration_after":"...","state_notes":"..."}. Do not invent numbers. Use only the supplied tool results and state.`},{role:'user',content:JSON.stringify({intent,results:toolResultSummary(results),state_delta:stateDelta,state:actorId?visibleStateFor(actor.id):modelStateForPlayer()})}]);if(typeof second.narration_after!=='string')throw Error('Second response schema invalid');const rollResults=results.flatMap(x=>{const r=x.result?.result??x.result;return [r,x.result?.morale?.result].filter(Boolean);}).filter(x=>x.roll||x.initiative||x.die!==undefined||x.dice||x.checks||x.encounter_checks||x.rounds||x.rerolled);logEntry('DM · Outcome',`[ROLLS]\n${second.narration_after}${second.state_notes?'\n\n'+second.state_notes:''}\n\n[STATE DELTA]\n${formatDelta(stateDelta)}\n\n[STATE]`,'dm',rollResults,true);addJournal(`${actor.name}: ${intent}\n${second.narration_after}`);if(!actorId&&state.campaign.turn_order.order.length&&state.campaign.turn_order.active_actor_id===actor.id){/* Turn advancement remains an explicit DM/kernel operation. */}}catch(e){logEntry('ENGINE / API ERROR',e.message,'dm');$('#debugPanel').classList.add('show');debugVisible=true;}finally{busy=false;$('#sendBtn').disabled=false;persist();if(state.campaign.turn_order.phase==='combat'&&state.npcs.some(n=>n.id===state.campaign.turn_order.active_actor_id))setTimeout(runNpcTurns,0);}}
+async function runNpcTurns(){if(busy)return;let safety=0;while(state.campaign.turn_order.phase==='combat'&&safety++<10){const id=engine.state.campaign.turn_order.active_actor_id,npc=engine.state.npcs.find(n=>n.id===id);if(!npc)break;if(npc.hp_current<=0||npc.fled){engine.advance_turn_order();persist();continue;}busy=true;$('#sendBtn').disabled=true;try{const before=engine.visible_state();logEntry('DM · NPC TURN',`${npc.name} acts.`,'dm');const first=await parseWithRetry([{role:'system',content:SYSTEM_PROMPT+'\n\nResolve the active NPC turn. Reply JSON only: {"narration_before":"...","tool_calls":[{"name":"...","args":{}}]}. Use the NPC stat block and visible situation. Resolve its legal actions, then advance_turn_order once. Do not invent numeric results.'},{role:'user',content:JSON.stringify({intent:`Resolve ${npc.name}’s turn.`,active_npc_id:id,state:engine.visible_state()})}]);if(typeof first.narration_before!=='string'||!Array.isArray(first.tool_calls))throw Error('NPC turn response schema invalid');logEntry('DM · Situation',first.narration_before+'\n\n[STATE DELTA]\nNo numeric state change.','dm',[],true);const results=executeToolBatch(first.tool_calls,null,()=>{if(engine.state.campaign.turn_order.active_actor_id===id)engine.advance_turn_order();});persist();const delta=diffState(before,engine.visible_state());const second=await parseWithRetry([{role:'system',content:SYSTEM_PROMPT+'\n\nNarrate the completed NPC turn. Reply JSON only: {"narration_after":"...","state_notes":"..."}. Use only the supplied engine results and state.'},{role:'user',content:JSON.stringify({results:toolResultSummary(results),state_delta:delta,state:modelStateForPlayer()})}]);const rr=results.flatMap(x=>{const r=x.result?.result??x.result;return [r,x.result?.morale?.result].filter(Boolean);}).filter(x=>x.roll||x.initiative||x.die!==undefined||x.dice||x.checks||x.encounter_checks||x.rounds||x.rerolled);const nl=String.fromCharCode(10);logEntry('DM · NPC OUTCOME',`[ROLLS]${nl}${second.narration_after}${second.state_notes?nl+nl+second.state_notes:''}${nl}${nl}[STATE DELTA]${nl}${formatDelta(delta)}${nl}${nl}[STATE]`,'dm',rr,true);addJournal(`${npc.name}: ${second.narration_after}`);persist();}catch(e){logEntry('NPC TURN ERROR',e.message,'dm');$('#debugPanel').classList.add('show');break;}finally{busy=false;$('#sendBtn').disabled=false;persist();}}} 
 function companionTurn(id){const p=state.pcs.find(x=>x.id===id);if(!p)return;const policy=p.policy||'Protect the party; act cautiously and follow the leader’s stated intent.';playerTurn(`You are companion ${p.name}. Policy: ${policy}. Assess only what you can perceive and take one legal action consistent with the current situation.`,id);}
 $('#sendBtn').onclick=()=>{const v=$('#playerInput').value.trim();if(!v)return;$('#playerInput').value='';playerTurn(v);};$('#playerInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#sendBtn').click();}});
 // Real elapsed time is charged from wall-clock deltas, including idle time and tab suspension.
@@ -140,12 +140,196 @@ setInterval(()=>{const now=Date.now(),elapsed=Math.max(0,(now-lastTick)/60000);i
 // Restore elapsed time since the last persisted browser tick.
 {const elapsed=Math.max(0,(Date.now()-lastTick)/60000);if(elapsed>0.01){engine._tick_light_state(elapsed);persist();}}
 $('#campaignName').addEventListener('change',e=>{engine.set_campaign_name(e.target.value);persist();});$('#saveBtn').onclick=()=>persist();$('#loadBtn').onclick=()=>{state=loadState();engine=new ShadowdarkEngine(state);render();logEntry('SYSTEM','Campaign loaded from localStorage.','dm',[],true);};$('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(engine.visible_state(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shadowdark-campaign.json';a.click();URL.revokeObjectURL(a.href);};$('#importBtn').onclick=()=>$('#importModal').classList.add('open');$('#importCancel').onclick=()=>$('#importModal').classList.remove('open');$('#importConfirm').onclick=()=>{try{const x=JSON.parse($('#importText').value);validateState(x);engine=new ShadowdarkEngine(x);persist();$('#importModal').classList.remove('open');logEntry('SYSTEM','Campaign state imported and validated.','dm',[],true);}catch(e){alert('Import rejected: '+e.message);}};
-function validateState(s){if(s.schema_version!=="1.0"||!s.campaign||!Array.isArray(s.pcs)||!Array.isArray(s.npcs)||!Array.isArray(s.loot))throw Error('State schema mismatch');for(const p of s.pcs){for(const k of ['STR','DEX','CON','INT','WIS','CHA'])if(!(k in p.stats))throw Error(`Missing ${k} on ${p.name}`);if(!p.gear||!p.hp||!p.turn_budget)throw Error(`Incomplete PC ${p.name}`);}return true;}
+function validateState(s){
+ const object=(v)=>!!v&&typeof v==="object"&&!Array.isArray(v);
+ const finite=(v)=>typeof v==="number"&&Number.isFinite(v);
+ const integer=(v)=>Number.isInteger(v);
+ const requireText=(v,label)=>{if(typeof v!=="string"||!v.trim())throw Error(label+" must be a non-empty string");};
+ if(!object(s)||s.schema_version!=="1.0"||!object(s.campaign)||!Array.isArray(s.pcs)||!Array.isArray(s.npcs)||!Array.isArray(s.mounts)||!Array.isArray(s.loot))throw Error("State schema mismatch or required collections are missing");
+ if(!integer(s.state_version)||s.state_version<0)throw Error("State version must be a non-negative integer");
+ if(s.pcs.length<1||s.pcs.length>4)throw Error("A campaign must contain one player character and no more than three companions");
+ const c=s.campaign;
+ for(const key of ["clock","environment","light","encounter_clock","travel","rest","turn_order"])if(!object(c[key]))throw Error("Campaign is missing "+key);
+ if(!Array.isArray(c.journal)||!Array.isArray(c.event_log)||!Array.isArray(c.treasure_log))throw Error("Campaign journal, event log, and treasure log must be arrays");
+ if(!integer(c.clock.game_day)||c.clock.game_day<1||!integer(c.clock.game_hour)||c.clock.game_hour<0||c.clock.game_hour>23||!integer(c.clock.game_minute)||c.clock.game_minute<0||c.clock.game_minute>59||!finite(c.clock.real_elapsed_minutes)||c.clock.real_elapsed_minutes<0)throw Error("Campaign clock is invalid");
+ requireText(c.environment.location_id,"Environment location ID");requireText(c.environment.location_name,"Environment location name");
+ if(!["unsafe","risky","deadly"].includes(c.environment.danger_level))throw Error("Campaign danger level is invalid");
+ if(!finite(c.light.remaining_real_minutes)||c.light.remaining_real_minutes<0||!Array.isArray(c.light.backup_sources)||!object(c.light.campfire))throw Error("Light state is invalid");
+ if(typeof c.light.lit!=="boolean"||typeof c.light.campfire.lit!=="boolean")throw Error("Light flags are invalid");
+ if(!["crawling","combat","rest","travel","camp"].includes(c.turn_order.phase)||!Array.isArray(c.turn_order.order)||!integer(c.turn_order.turn_index)||c.turn_order.turn_index<0||!integer(c.turn_order.round)||c.turn_order.round<1)throw Error("Turn order state is invalid");
+ if(!Array.isArray(c.travel.visited_hexes)||!Array.isArray(c.travel.visible_hexes)||!Array.isArray(c.rest.pc_ids)||!Array.isArray(c.rest.failed_pc_ids)||!Array.isArray(c.rest.interruption_checks)||!finite(c.rest.hours_elapsed)||c.rest.hours_elapsed<0||!finite(c.encounter_clock.crawling_rounds_since_check)||c.encounter_clock.crawling_rounds_since_check<0)throw Error("Travel, rest, or encounter-clock state is invalid");
+ const ids=new Set();
+ const register=(id,label)=>{requireText(id,label+" ID");if(ids.has(id))throw Error("Duplicate actor or loot ID: "+id);ids.add(id);};
+ for(const p of s.pcs){
+  if(!object(p))throw Error("PC entry must be an object");register(p.id,"PC");requireText(p.name,"PC name");requireText(p.class,"PC class");
+  if(!object(p.stats)||!object(p.hp)||!object(p.gear)||!object(p.turn_budget)||!object(p.spells)||!object(p.position))throw Error("Incomplete PC "+p.name);
+  for(const stat of ["STR","DEX","CON","INT","WIS","CHA"])if(!finite(p.stats[stat])||p.stats[stat]<3||p.stats[stat]>20)throw Error("Invalid "+stat+" score on "+p.name);
+  if(!integer(p.hp.current)||!integer(p.hp.maximum)||!integer(p.hp.temporary)||p.hp.current<0||p.hp.maximum<1||p.hp.current>p.hp.maximum||p.hp.temporary<0)throw Error("Invalid HP values on "+p.name);
+  if(!integer(p.ac)||p.ac<0||!integer(p.hit_die)||p.hit_die<2)throw Error("Invalid AC or hit die on "+p.name);
+  if(!Array.isArray(p.gear.items)||!integer(p.gear.rations_count)||p.gear.rations_count<0)throw Error("Invalid inventory on "+p.name);
+  for(const item of p.gear.items)if(!object(item)||typeof item.id!=="string"||!item.id.trim()||typeof item.name!=="string"||!item.name.trim()||!integer(item.quantity)||item.quantity<0||!integer(item.slots_each)||item.slots_each<0)throw Error("Invalid inventory item on "+p.name);
+  if(typeof p.turn_budget.action_used!=="boolean"||!integer(p.turn_budget.near_moves_used)||p.turn_budget.near_moves_used<0||!["none","close","near","far"].includes(p.turn_budget.movement_used))throw Error("Invalid turn budget on "+p.name);
+  for(const key of ["known","available","unavailable_until_rest","penance_required","mishap_pending","penance_completed"])if(!Array.isArray(p.spells[key]))throw Error("Invalid spell tracking on "+p.name);
+  if(!Array.isArray(p.attacks)||!Array.isArray(p.conditions))throw Error("Invalid attacks or conditions on "+p.name);
+  if(!["close","near","far"].includes(p.position.distance))throw Error("Invalid PC distance on "+p.name);
+ }
+ for(const n of s.npcs){
+  if(!object(n))throw Error("NPC entry must be an object");register(n.id,"NPC");requireText(n.name,"NPC name");
+  if(!finite(n.ac)||!finite(n.hp_current)||!finite(n.hp_maximum)||n.hp_current<0||n.hp_maximum<0||n.hp_current>n.hp_maximum||!object(n.stats)||!Array.isArray(n.attacks)||!Array.isArray(n.conditions)||!object(n.position))throw Error("Invalid NPC combat state on "+n.name);
+  for(const stat of ["STR","DEX","CON","INT","WIS","CHA"])if(!finite(n.stats[stat]))throw Error("Invalid "+stat+" score on NPC "+n.name);
+  if(!["close","near","far"].includes(n.position.distance))throw Error("Invalid NPC distance on "+n.name);
+ }
+ const actorIds=new Set(ids);
+ for(const m of s.mounts){if(!object(m)||!finite(m.CON)||!finite(m.rations_count)||m.rations_count<0)throw Error("Invalid mount entry");register(m.id,"Mount");}
+ for(const item of s.loot){if(!object(item))throw Error("Loot entry must be an object");register(item.id,"Loot");requireText(item.name,"Loot name");if(typeof item.secured!=="boolean")throw Error("Loot secured flag is invalid");}
+ for(const id of c.turn_order.order)if(!actorIds.has(id))throw Error("Turn order references an unknown character or creature: "+id);
+ if(c.turn_order.active_actor_id!==null&&c.turn_order.active_actor_id!==undefined&&!actorIds.has(c.turn_order.active_actor_id))throw Error("Turn order active actor is unknown");
+ if(c.turn_order.order.length&&(c.turn_order.turn_index>=c.turn_order.order.length||c.turn_order.active_actor_id!==c.turn_order.order[c.turn_order.turn_index]))throw Error("Turn order index and active actor do not match");
+ if(!c.turn_order.order.length&&c.turn_order.active_actor_id!==null&&c.turn_order.active_actor_id!==undefined)throw Error("An active actor cannot exist without an initiative order");
+ return true;
+}
 $('#fileInput').onchange=async e=>{const f=e.target.files[0];if(f)$('#importText').value=await f.text();};$('#settingsBtn').onclick=()=>{ $('#apiBase').value=settings.base||'https://api.openai.com/v1';$('#apiKey').value=settings.key||'';$('#modelName').value=settings.model||'gpt-4o-mini';$('#temperature').value=settings.temperature??0.7;$('#settingsModal').classList.add('open');};$('#settingsCancel').onclick=()=>$('#settingsModal').classList.remove('open');$('#settingsSave').onclick=()=>{settings={base:$('#apiBase').value.trim(),key:$('#apiKey').value,model:$('#modelName').value.trim(),temperature:Math.max(0,Math.min(2,Number($('#temperature').value)))};if(!/^https?:\/\//.test(settings.base))return alert('API base URL must begin with http:// or https://');localStorage.setItem('sd.settings',JSON.stringify(settings));$('#settingsModal').classList.remove('open');$('#saveStatus').textContent='SETTINGS SAVED';};$('#debugBtn').onclick=()=>{$('#debugPanel').classList.toggle('show');debugVisible=!debugVisible;};document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.tabcontent').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));});
 // Explicit argument contracts prevent JSON property order from changing tool semantics.
 const ARG_ORDER={stat_check:['actor_id','stat','dc','advantage','disadvantage','routine_trained','dc_source'],contested_check:['a_id','a_stat','b_id','b_stat','a_adv','a_dis','b_adv','b_dis'],attack:['attacker_id','target_id','kind','damage_count','damage_sides','attack_bonus','damage_bonus','talent_bonus','advantage','disadvantage','stat'],apply_damage:['target_id','amount','cause','source_id'],apply_healing:['target_id','amount','cause'],cast_spell:['pc_id','spell_name','tier','caster_kind','mishap_die_sides'],maintain_focus:['pc_id','spell_name','tier','caster_kind'],start_dying:['pc_id'],dying_turn:['pc_id'],first_aid:['helper_id','target_id','target_distance'],begin_pc_turn:['pc_id'],consume_action:['pc_id','action_name'],move_pc:['pc_id','destination_id','distance'],initiative:['actor_ids'],set_surprise_queue:['ids'],morale_check:['npc_id','leader_modifier'],reaction_check:['pc_id','recognized','creature_always_hostile','npc_id'],encounter_check:['phase','gm_triggered','loud_disturbance'],tick_light:['minutes'],ignite_torch:['pc_id','torch_item_name'],light_campfire:['pc_id','torch_item_name'],begin_rest:['pc_ids'],rest_interruption:['ids'],advance_rest:['hours'],finish_rest:[],add_item:['pc_id','item'],gear_slots:['pc_id'],award_treasure_xp:['treasure_id','quality','secured'],reroll_with_luck:['pc_id','sides','count','modifier','advantage','disadvantage','critical_failure','luck_generating_effect'],spend_luck_token:['pc_id','sides','count','modifier','advantage','disadvantage','critical_failure','luck_generating_effect'],give_luck_token:['from_pc_id','to_pc_id'],reaches_weather:[],reaches_encounters:['pushing'],reaches_daily_rations:['pc_ids','mount_ids','harsh_climate'],reaches_forage:['pc_id','dc','harsh_climate','stormy','pushing'],advance_turn_order:[],visible_state:[],set_npc_attitude:['npc_id','attitude'],set_group_numbers:['npc_id','current_number','leader_modifier'],complete_penance:['pc_id','spell_name'],set_campfire_presence:['someone_nearby'],reaches_daily_budget:['method','pushing'],reaches_hex_cost:['terrain'],set_phase:['phase'],set_location:['location_id','location_name','region'],set_danger_level:['level'],set_western_reaches:['enabled','hard_luck_mode'],set_campaign_name:['name'],add_journal_entry:['text'],secure_loot:['loot_id'],add_pc:['pc'],set_condition:['actor_id','condition','active'],move_npc:['npc_id','destination_id','distance']};
 TOOL_NAMES.add('spend_luck_token');TOOL_NAMES.add('reaches_daily_budget');TOOL_NAMES.add('reaches_hex_cost');TOOL_NAMES.delete('begin_pc_turn');for(const n of ['move_npc','set_phase','set_location','set_danger_level','set_western_reaches','set_campaign_name','add_journal_entry','secure_loot','add_pc','set_condition'])TOOL_NAMES.add(n);
-function executeTool(call,perceivedActorId=null){if(!TOOL_NAMES.has(call.name))throw Error(`Tool not allowed: ${call.name}`);const args=call.args||{},fn=engine[call.name];if(typeof fn!=='function')throw Error(`Kernel function missing: ${call.name}`);if(perceivedActorId){const visible=visibleStateFor(perceivedActorId),allowed=new Set([perceivedActorId,...visible.visible_pcs.map(x=>x.id),...visible.visible_npcs.map(x=>x.id)]);if(["add_pc","set_campaign_name","set_location","set_danger_level","set_western_reaches","set_phase","add_journal_entry","secure_loot","award_treasure_xp"].includes(call.name))throw Error("Companions cannot perform campaign-administration operations");for(const key of ["actor_id","a_id","b_id","attacker_id","target_id","helper_id","npc_id","pc_id","from_pc_id","to_pc_id"]){if(args[key]&&!allowed.has(args[key]))throw Error(`Companion cannot perceive or target ${args[key]}`);}if(Array.isArray(args.mount_ids)&&args.mount_ids.length)throw Error("Companion cannot act on unseen mounts");for(const key of ["actor_ids","ids","pc_ids"]){if(Array.isArray(args[key])&&args[key].some(id=>!allowed.has(id)))throw Error("Companion cannot act on an unseen character or creature");}}const ordered=(ARG_ORDER[call.name]||[]).map(k=>args[k]);const result=call.name==="visible_state"&&perceivedActorId?visibleStateFor(perceivedActorId):fn.apply(engine,ordered);if(call.name!=='visible_state')persist();return {name:call.name,args,result};}
+const ARG_TYPES={
+ actor_id:"string",stat:"string",dc:"number",advantage:"boolean",disadvantage:"boolean",routine_trained:"boolean",dc_source:"string",
+ a_id:"string",a_stat:"string",b_id:"string",b_stat:"string",a_adv:"boolean",a_dis:"boolean",b_adv:"boolean",b_dis:"boolean",
+ attacker_id:"string",target_id:"string",kind:"string",damage_count:"number",damage_sides:"number",attack_bonus:"number",damage_bonus:"number",talent_bonus:"number",
+ amount:"number",cause:"string",source_id:"string",pc_id:"string",spell_name:"string",tier:"number",caster_kind:"string",mishap_die_sides:"number",
+ helper_id:"string",target_distance:"string",npc_id:"string",leader_modifier:"number",recognized:"boolean",creature_always_hostile:"boolean",
+ current_number:"number",action_name:"string",destination_id:"string",distance:"string",actor_ids:"array",ids:"array",
+ phase:"string",gm_triggered:"boolean",loud_disturbance:"boolean",minutes:"number",torch_item_name:"string",someone_nearby:"boolean",
+ pc_ids:"array",hours:"number",item:"object",treasure_id:"string",quality:"string",loot_id:"string",secured:"boolean",sides:"number",count:"number",
+ modifier:"number",critical_failure:"boolean",luck_generating_effect:"boolean",from_pc_id:"string",to_pc_id:"string",
+ pushing:"boolean",mount_ids:"array",harsh_climate:"boolean",pc_id:"string",dc:"number",stormy:"boolean",method:"string",terrain:"string",
+ attitude:"string",text:"string",spell_name:"string",region:"string",location_id:"string",location_name:"string",level:"string",enabled:"boolean",
+ hard_luck_mode:"boolean",name:"string",pc:"object",condition:"string",active:"boolean"
+};
+const TOOL_REQUIRED={
+ stat_check:["actor_id","stat","dc"],contested_check:["a_id","a_stat","b_id","b_stat"],
+ attack:["attacker_id","target_id","kind","damage_count","damage_sides"],apply_damage:["target_id","amount"],
+ apply_healing:["target_id","amount"],cast_spell:["pc_id","spell_name","tier","caster_kind"],
+ maintain_focus:["pc_id","spell_name","tier","caster_kind"],start_dying:["pc_id"],dying_turn:["pc_id"],
+ first_aid:["helper_id","target_id"],consume_action:["pc_id","action_name"],move_pc:["pc_id","destination_id"],
+ initiative:["actor_ids"],set_surprise_queue:["ids"],morale_check:["npc_id"],reaction_check:[],encounter_check:[],tick_light:["minutes"],
+ ignite_torch:["pc_id"],light_campfire:["pc_id"],set_campfire_presence:["someone_nearby"],
+ begin_rest:["pc_ids"],rest_interruption:["ids"],advance_rest:["hours"],finish_rest:[],
+ add_item:["pc_id","item"],gear_slots:["pc_id"],award_treasure_xp:["treasure_id","quality"],
+ reroll_with_luck:["pc_id","sides"],spend_luck_token:["pc_id","sides"],give_luck_token:["from_pc_id","to_pc_id"],
+ reaches_weather:[],reaches_encounters:[],reaches_daily_rations:["pc_ids"],reaches_forage:["pc_id"],
+ reaches_daily_budget:["method"],reaches_hex_cost:["terrain"],advance_turn_order:[],visible_state:[],
+ set_npc_attitude:["npc_id","attitude"],set_group_numbers:["npc_id","current_number"],
+ complete_penance:["pc_id","spell_name"],set_phase:["phase"],set_location:["location_id","location_name"],
+ set_danger_level:["level"],set_western_reaches:["enabled"],set_campaign_name:["name"],
+ add_journal_entry:["text"],secure_loot:["loot_id"],add_pc:["pc"],
+ set_condition:["actor_id","condition"],move_npc:["npc_id","destination_id"]
+};
+const NULLABLE_ARGS=new Set(["dc_source","source_id","npc_id","pc_id","leader_modifier","region","stat"]);
+const INTEGER_ARGS=new Set(["dc","damage_count","damage_sides","attack_bonus","damage_bonus","talent_bonus","amount","tier","mishap_die_sides","leader_modifier","current_number","count","sides","modifier"]);
+function validatePCPayload(pc){
+ if(!pc||typeof pc!=="object"||Array.isArray(pc))throw Error("add_pc requires a character object");
+ for(const key of ["id","name","class","policy"])if(typeof pc[key]!=="string"||!pc[key].trim())throw Error("New character requires a non-empty "+key);
+ if(!["fighter","thief","wizard","priest"].includes(pc.class))throw Error("New character class must be fighter, thief, wizard, or priest");
+ if(!pc.stats||typeof pc.stats!=="object")throw Error("New character requires stats");
+ for(const stat of ["STR","DEX","CON","INT","WIS","CHA"])if(!Number.isFinite(pc.stats[stat])||pc.stats[stat]<3||pc.stats[stat]>20)throw Error("Invalid "+stat+" score on new character");
+ if(!pc.hp||!Number.isInteger(pc.hp.current)||!Number.isInteger(pc.hp.maximum)||pc.hp.maximum<1||pc.hp.current<0||pc.hp.current>pc.hp.maximum)throw Error("New character HP is invalid");
+ if(!Number.isInteger(pc.ac)||pc.ac<0||!Number.isInteger(pc.hit_die)||pc.hit_die<2)throw Error("New character AC or hit die is invalid");
+ if(!pc.gear||!Array.isArray(pc.gear.items)||!Number.isInteger(pc.gear.rations_count)||pc.gear.rations_count<0)throw Error("New character gear is incomplete");
+ if(!Array.isArray(pc.attacks)||!pc.spells||!Array.isArray(pc.conditions)||!pc.position||!pc.turn_budget)throw Error("New character combat, spell, condition, position, or turn data is incomplete");
+ for(const item of pc.gear.items){
+  if(!item||typeof item.id!=="string"||!item.id.trim()||typeof item.name!=="string"||!item.name.trim()||!Number.isInteger(item.quantity)||item.quantity<0||!Number.isInteger(item.slots_each)||item.slots_each<0)throw Error("New character contains an invalid inventory item");
+ }
+ if(typeof pc.turn_budget.action_used!=="boolean"||!Number.isInteger(pc.turn_budget.near_moves_used)||pc.turn_budget.near_moves_used<0)throw Error("New character turn budget is invalid");
+}
+function validateToolCall(call){
+ if(!call||typeof call!=="object"||Array.isArray(call))throw Error("Each tool call must be an object");
+ if(typeof call.name!=="string"||!TOOL_NAMES.has(call.name))throw Error("Tool not allowed: "+String(call.name));
+ const allowed=ARG_ORDER[call.name];
+ if(!Array.isArray(allowed)||!Object.prototype.hasOwnProperty.call(TOOL_REQUIRED,call.name))throw Error("Tool has no declared argument contract: "+call.name);
+ const args=call.args===undefined?{}:call.args;
+ if(!args||typeof args!=="object"||Array.isArray(args))throw Error("Tool args must be a JSON object: "+call.name);
+ for(const key of Object.keys(args))if(!allowed.includes(key))throw Error("Unexpected argument for "+call.name+": "+key);
+ for(const key of TOOL_REQUIRED[call.name])if(!Object.prototype.hasOwnProperty.call(args,key)||args[key]===null||args[key]===undefined)throw Error("Missing required argument for "+call.name+": "+key);
+ for(const key of Object.keys(args)){
+  const value=args[key],type=ARG_TYPES[key];
+  if(!type)throw Error("Argument has no declared type: "+key);
+  if(value===null||value===undefined){if(TOOL_REQUIRED[call.name].includes(key)||!NULLABLE_ARGS.has(key))throw Error("Null is not allowed for "+call.name+"."+key);continue;}
+  if(type==="array"){
+   if(!Array.isArray(value)||value.some(x=>typeof x!=="string"||!x.trim()))throw Error(call.name+"."+key+" must be an array of non-empty strings");
+   if(value.length>30||new Set(value).size!==value.length)throw Error(call.name+"."+key+" contains too many or duplicate entries");
+  }else if(type==="object"){
+   if(!value||typeof value!=="object"||Array.isArray(value))throw Error(call.name+"."+key+" must be an object");
+  }else if(typeof value!==type)throw Error(call.name+"."+key+" must be "+type);
+  if(type==="string"&&(!value.trim()||value.length>10000))throw Error(call.name+"."+key+" must be non-empty and at most 10000 characters");
+  if(type==="number"&&!Number.isFinite(value))throw Error(call.name+"."+key+" must be a finite number");
+  if(type==="number"&&INTEGER_ARGS.has(key)&&!Number.isInteger(value))throw Error(call.name+"."+key+" must be an integer");
+ }
+ const a=args;
+ const inList=(key,values)=>a[key]!==undefined&&a[key]!==null&&!values.includes(a[key]);
+ for(const key of ["stat","a_stat","b_stat"])if(inList(key,["STR","DEX","CON","INT","WIS","CHA"]))throw Error(call.name+"."+key+" is not a Shadowdark stat");
+ if(inList("kind",["melee","ranged"]))throw Error("Attack kind must be melee or ranged");
+ if(inList("caster_kind",["wizard","priest"]))throw Error("Caster kind must be wizard or priest");
+ if(inList("quality",["poor","normal","fabulous","legendary"]))throw Error("Unknown treasure quality");
+ if(inList("attitude",["hostile","suspicious","neutral","curious","friendly"]))throw Error("Unknown NPC attitude");
+ if(inList("level",["unsafe","risky","deadly"]))throw Error("Danger level must be unsafe, risky, or deadly");
+ if(inList("method",["walking","mounted","sailing"]))throw Error("Travel method must be walking, mounted, or sailing");
+ if(inList("terrain",["normal","difficult","impassable"]))throw Error("Unknown Western Reaches terrain");
+ if(call.name==="set_phase"&&inList("phase",["crawling","combat","rest","travel","camp"]))throw Error("Invalid campaign phase");
+ if(call.name==="encounter_check"&&inList("phase",["crawling","combat","travel","camp"]))throw Error("Invalid encounter-check phase");
+ if(call.name==="move_pc"&&inList("distance",["close","near"]))throw Error("PC movement must be close or near");
+ if(call.name==="move_npc"&&inList("distance",["close","near","far"]))throw Error("NPC distance must be close, near, or far");
+ if(a.dc!==undefined&&(!Number.isInteger(a.dc)||a.dc<1||a.dc>100))throw Error("DC must be an integer from 1 to 100");
+ if(call.name==="stat_check"&&![9,12,15,18].includes(a.dc)&&!a.dc_source)throw Error("A nonstandard stat-check DC requires a source citation");
+ if(call.name==="reaches_forage"&&a.dc!==undefined&&![9,12,15,18].includes(a.dc))throw Error("Foraging DC must use the standard DC ladder");
+ if(a.amount!==undefined&&(a.amount<0||a.amount>100000))throw Error("Amount must be between 0 and 100000");
+ if(a.damage_count!==undefined&&(a.damage_count<1||a.damage_count>20))throw Error("Damage dice count must be between 1 and 20");
+ if(a.damage_sides!==undefined&&(a.damage_sides<2||a.damage_sides>100))throw Error("Damage die sides must be between 2 and 100");
+ if(a.tier!==undefined&&(a.tier<1||a.tier>5))throw Error("Spell tier must be between 1 and 5");
+ if(a.sides!==undefined&&(a.sides<2||a.sides>100))throw Error("Die sides must be between 2 and 100");
+ if(a.count!==undefined&&(a.count<1||a.count>100))throw Error("Dice count must be between 1 and 100");
+ if(a.mishap_die_sides!==undefined&&(a.mishap_die_sides<2||a.mishap_die_sides>100))throw Error("Mishap die sides must be between 2 and 100");
+ if(a.minutes!==undefined&&(a.minutes<0||a.minutes>100000))throw Error("Light time must be between 0 and 100000 minutes");
+ if(a.hours!==undefined&&(a.hours<0||a.hours>1000))throw Error("Rest duration must be between 0 and 1000 hours");
+ if(a.current_number!==undefined&&(a.current_number<0||a.current_number>10000))throw Error("Group size must be between 0 and 10000");
+ if(a.leader_modifier!==undefined&&a.leader_modifier!==null&&(a.leader_modifier< -50||a.leader_modifier>50))throw Error("Leader modifier is out of range");
+ if(a.pc_ids&&(!a.pc_ids.length||a.pc_ids.length>4))throw Error("PC list must contain between 1 and 4 unique IDs");
+ if(a.actor_ids&&!a.actor_ids.length)throw Error("Initiative requires at least one actor");
+ if(a.ids&&call.name==="rest_interruption"&&!a.ids.length)throw Error("Rest interruption requires at least one affected PC");
+ if(a.item){
+  const item=a.item;
+  if(typeof item.id!=="string"||!item.id.trim()||typeof item.name!=="string"||!item.name.trim()||!Number.isInteger(item.quantity)||item.quantity<1||!Number.isInteger(item.slots_each)||item.slots_each<0)throw Error("Inventory item requires id, name, positive quantity, and non-negative slots_each");
+  if(item.status!==undefined&&typeof item.status!=="string")throw Error("Inventory item status must be a string");
+ }
+ if(a.pc){
+  validatePCPayload(a.pc);
+  if(engine.state.pcs.some(p=>p.id===a.pc.id))throw Error("PC id already exists");
+  if(engine.state.pcs.length>=4)throw Error("Maximum party size is one player character plus three companions");
+ }
+ return true;
+}
+function executeTool(call,perceivedActorId=null){validateToolCall(call);const args=call.args||{},fn=engine[call.name];if(typeof fn!=='function')throw Error("Kernel function missing: "+call.name);if(perceivedActorId){const visible=visibleStateFor(perceivedActorId),allowed=new Set([perceivedActorId,...visible.visible_pcs.map(x=>x.id),...visible.visible_npcs.map(x=>x.id)]);if(["add_pc","set_campaign_name","set_location","set_danger_level","set_western_reaches","set_phase","add_journal_entry","secure_loot","award_treasure_xp"].includes(call.name))throw Error("Companions cannot perform campaign-administration operations");for(const key of ["actor_id","a_id","b_id","attacker_id","target_id","helper_id","npc_id","pc_id","from_pc_id","to_pc_id"]){if(args[key]&&!allowed.has(args[key]))throw Error("Companion cannot perceive or target "+args[key]);}if(Array.isArray(args.mount_ids)&&args.mount_ids.length)throw Error("Companion cannot act on unseen mounts");for(const key of ["actor_ids","ids","pc_ids"]){if(Array.isArray(args[key])&&args[key].some(id=>!allowed.has(id)))throw Error("Companion cannot act on an unseen character or creature");}}const ordered=(ARG_ORDER[call.name]||[]).map(k=>args[k]===null?undefined:args[k]);const result=call.name==="visible_state"&&perceivedActorId?visibleStateFor(perceivedActorId):fn.apply(engine,ordered);return {name:call.name,args,result};}
+
+
+function executeToolBatch(calls,perceivedActorId=null,afterBatch=null){
+ if(!Array.isArray(calls))throw Error("tool_calls must be an array");
+ if(calls.length>16)throw Error("A single turn may contain no more than 16 tool calls");
+ if(afterBatch!==null&&typeof afterBatch!=="function")throw Error("Invalid internal batch completion callback");
+ const snapshot=engine.visible_state(),priorRollLog=engine.rollLog.slice(),results=[];
+ try{
+  for(const call of calls)validateToolCall(call);
+  for(const call of calls)results.push(executeTool(call,perceivedActorId));
+  if(afterBatch)afterBatch();
+  return results;
+ }catch(error){
+  engine=new ShadowdarkEngine(snapshot);
+  engine.rollLog=priorRollLog;
+  const reason=error&&error.message?error.message:String(error);
+  const rollbackError=new Error("Tool batch rolled back; no proposed state changes were committed. "+reason);
+  rollbackError.batchRolledBack=true;
+  throw rollbackError;
+ }
+}
 
 function runSelfTest(){const out=$('#debugOutput');out.innerHTML='';$('#debugPanel').classList.add('show');debugVisible=true;let passed=0,failed=0;const report=(name,expected,actual,ok)=>{const d=document.createElement('div');d.className='testline '+(ok?'pass':'fail');d.textContent=`${ok?'PASS':'FAIL'} | ${name} | expected: ${fmt(expected)} | actual: ${fmt(actual)}`;out.append(d);if(ok)passed++;else failed++;};const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);const fixture=(nums)=>{const q=[...nums];const fn=sides=>{if(!q.length)throw Error(`Dice fixture exhausted (d${sides})`);const n=q.shift();if(n<1||n>sides)throw Error(`Fixture ${n} invalid for d${sides}`);return n;};fn.remaining=()=>q.length;return fn;};const fresh=(nums)=>new ShadowdarkEngine(defaultState(),fixture(nums));
 // Ten-turn fixed-fixture smoke test from §10.
@@ -178,6 +362,42 @@ const adaptedState=defaultState(),adapted=new ShadowdarkEngine(adaptedState,fixt
 const otherPhase=adapted.encounter_check('combat');report('Stress: darkness check does not fire outside crawling',false,otherPhase.result.checked,!otherPhase.result.checked);const litState=defaultState(),litEngine=new ShadowdarkEngine(litState,fixture([]));litEngine.state.pcs.forEach(x=>x.position.in_total_darkness=false);litEngine.state.campaign.environment.total_darkness=false;const noLightTrigger=litEngine.encounter_check('crawling');report('Stress: no forced encounter check when crawling in light',false,noLightTrigger.result.checked,!noLightTrigger.result.checked);
 const turnState=defaultState(),turns=new ShadowdarkEngine(turnState,fixture([]));for(let i=0;i<30;i++){const id=i%2?'lysa':'rook';turns.begin_pc_turn(id);turns.consume_action(id,'stress action');}report('Stress: 30-turn action-budget cycle completes',{turns:30,commits:60},{turns:30,commits:turns.state.state_version},turns.state.state_version===60);
 }catch(err){report('30-turn stress test exception','none',err.message,false);}
+// Engine-reliability regression tests: schemas, import invariants, and atomic rollback.
+try{
+ const uncovered=[...TOOL_NAMES].filter(name=>!ARG_ORDER[name]||!TOOL_REQUIRED[name]||ARG_ORDER[name].some(key=>!ARG_TYPES[key]));
+ report("Reliability: every exposed tool has a complete argument contract",[],uncovered,uncovered.length===0);
+ let rejected=false;try{validateToolCall({name:"not_a_kernel_tool",args:{}});}catch{rejected=true;}
+ report("Reliability: unknown tool names are rejected",true,rejected,rejected);
+ rejected=false;try{validateToolCall({name:"stat_check",args:{actor_id:"rook",stat:"STR",dc:12,unapproved:true}});}catch{rejected=true;}
+ report("Reliability: unexpected arguments are rejected",true,rejected,rejected);
+ rejected=false;try{validateToolCall({name:"stat_check",args:{actor_id:"rook",stat:"STR"}});}catch{rejected=true;}
+ report("Reliability: missing required arguments are rejected",true,rejected,rejected);
+ rejected=false;try{validateToolCall({name:"attack",args:{attacker_id:"rook",target_id:"goblin",kind:"spell",damage_count:1,damage_sides:6}});}catch{rejected=true;}
+ report("Reliability: invalid enum values are rejected",true,rejected,rejected);
+ rejected=false;try{validateToolCall({name:"stat_check",args:{actor_id:"rook",stat:"STR",dc:13}});}catch{rejected=true;}
+ report("Reliability: nonstandard DCs require a source citation",true,rejected,rejected);
+ const validState=defaultState();report("Reliability: default campaign passes import validation",true,validateState(validState),validateState(validState)===true);
+ const invalidState=clone(validState);invalidState.pcs[0].hp.current=invalidState.pcs[0].hp.maximum+1;rejected=false;try{validateState(invalidState);}catch{rejected=true;}
+ report("Reliability: invalid HP totals are rejected on import",true,rejected,rejected);
+ const invalidNpc=clone(validState);delete invalidNpc.npcs[0].stats.WIS;rejected=false;try{validateState(invalidNpc);}catch{rejected=true;}
+ report("Reliability: incomplete NPC stat blocks are rejected on import",true,rejected,rejected);
+ const lootTurn=clone(validState);lootTurn.campaign.turn_order.order=["treasure-01"];lootTurn.campaign.turn_order.active_actor_id="treasure-01";rejected=false;try{validateState(lootTurn);}catch{rejected=true;}
+ report("Reliability: treasure cannot occupy an initiative slot",true,rejected,rejected);
+ const originalEngine=engine;engine=fresh([]);
+ let rejectedBeforeMutation=false;
+ try{executeToolBatch([{name:"set_condition",args:{actor_id:"rook",condition:"preflight-test"}},{name:"stat_check",args:{actor_id:"rook",stat:"STR",dc:"12"}}],null);}catch(error){rejectedBeforeMutation=error.batchRolledBack===true;}
+ const preflightClean=engine.state.state_version===0&&engine.state.pcs[0].conditions.length===0;
+ report("Reliability: all calls validate before the batch mutates state",true,{rejected:rejectedBeforeMutation,version:engine.state.state_version,conditions:engine.state.pcs[0].conditions},rejectedBeforeMutation&&preflightClean);
+ let rolledBack=false,rollbackMessage="";
+ try{executeToolBatch([{name:"set_condition",args:{actor_id:"rook",condition:"transaction-test"}},{name:"secure_loot",args:{loot_id:"missing-test-loot"}}],null);}catch(error){rolledBack=error.batchRolledBack===true;rollbackMessage=error.message;}
+ const unchanged=engine.state.state_version===0&&engine.state.pcs[0].conditions.length===0;
+ report("Reliability: engine failure rolls back earlier successful calls",{version:0,conditions:[]},{version:engine.state.state_version,conditions:engine.state.pcs[0].conditions,rollback:rolledBack},rolledBack&&unchanged&&rollbackMessage.includes("no proposed state changes were committed"));
+ let callbackRolledBack=false;
+ try{executeToolBatch([{name:"set_condition",args:{actor_id:"rook",condition:"callback-test"}}],null,()=>{throw Error("simulated turn-advance failure");});}catch(error){callbackRolledBack=error.batchRolledBack===true;}
+ report("Reliability: turn-advance failure rolls back the whole batch",true,{rolledBack:callbackRolledBack,version:engine.state.state_version,conditions:engine.state.pcs[0].conditions},callbackRolledBack&&engine.state.state_version===0&&engine.state.pcs[0].conditions.length===0);
+ engine=originalEngine;
+}catch(error){report("Reliability regression test harness exception","none",error.message,false);}
+
 $('#saveStatus').textContent=`SELF-TEST ${failed?'FAILED':'PASSED'} · ${passed} PASS / ${failed} FAIL`;logEntry('SELF-TEST',`Completed: ${passed} passed, ${failed} failed. See Debug panel for exact values.`,'dm');return {passed,failed};}
 function fmt(v){return typeof v==='string'?v:JSON.stringify(v);}
 $('#selfTestBtn').onclick=runSelfTest;
