@@ -122,6 +122,8 @@ class RuleSourceLibrary{
   const byId=new Map(docs.map(x=>[x.id,x]));
   if(!SOURCES.every(x=>byId.has(x.id))){this.status="incomplete";this.documents=docs;this.chunks=[];this.ready=false;this.error="All three source books are required.";return false;}
   this.documents=SOURCES.map(x=>byId.get(x.id));this.chunks=this.documents.flatMap(parseDocument);
+  this.termDocumentFrequency=new Map();
+  for(const chunk of this.chunks)for(const term of new Set(tokens(chunk.searchText)))this.termDocumentFrequency.set(term,(this.termDocumentFrequency.get(term)||0)+1);
   this.status="ready";this.ready=true;this.error="";this.origin=origin;return true;
  }
  summary(){return {status:this.status,error:this.error,origin:this.origin,ready:this.ready,documentCount:this.documents.length,chunkCount:this.chunks.length,cacheWarning:this.cacheWarning};}
@@ -170,9 +172,10 @@ class RuleSourceLibrary{
   for(const chunk of this.chunks){
    let score=0;
    for(const [term,weight] of terms){
-    const occurrences=chunk.searchText.split(term).length-1;
-    if(occurrences>0)score+=(1+Math.log(occurrences))*weight;
-    if(chunk.title.toLowerCase().includes(term))score+=4*weight;
+    const occurrences=chunk.searchText.split(term).length-1,docFrequency=this.termDocumentFrequency.get(term)||0;
+    const inverseDocumentWeight=1+Math.log((this.chunks.length+1)/(docFrequency+1));
+    if(occurrences>0)score+=(1+Math.log(occurrences))*weight*inverseDocumentWeight;
+    if(chunk.title.toLowerCase().includes(term))score+=4*weight*inverseDocumentWeight;
    }
    if(score<=0)continue;
    const titleLower=chunk.title.toLowerCase();
@@ -214,7 +217,7 @@ class RuleSourceLibrary{
   const samples=[
    {id:"01",label:"Core Rules",content:"{80}----------------\n## Morale\nEnemies reduced to half their number flee if they fail a DC 15 Wisdom check. Large groups make one check using the leader Wisdom modifier, while a solo enemy checks when it reaches half its hit points.\n{81}----------------\n## Wizard Mishaps\nOn a natural 1, roll on the wizard mishap table for the spell tier. The result may harm the caster, change the spell target, or impose a further restriction. Use the table printed for the caster spell tier."},
    {id:"02",label:"Player Guide",content:"{225}----------------\n## Hex Crawling\nTravel across six-mile hexes. Terrain changes the daily travel budget, and the party selects a travel method before moving. Weather and encounters are resolved through the travel procedure.\n{226}----------------\n## Climate\nStormy weather changes foraging. The region and season determine the climate, and harsh climate changes the party ration requirement."},
-   {id:"03",label:"Game Master Guide",content:"{54}----------------\n## Forest Encounters\nUse the regional encounter table when the party travels through the forest. Roll the listed die and apply the keyed encounter result; do not substitute a different terrain table."}
+   {id:"03",label:"Game Master Guide",content:"{54}----------------\n## Forest Encounters\nUse the regional encounter table when the party travels through the forest. Roll the listed die and apply the keyed encounter result; do not substitute a different terrain table.\n{55}----------------\n## Sablewood Encounters\nSablewood encounters use the Sablewood regional encounter table. The table's results are specific to this forest and should not be replaced with canyon or desert results."}
   ];
   const prior={documents:this.documents,chunks:this.chunks,ready:this.ready,status:this.status,error:this.error,origin:this.origin};
   try{
@@ -222,6 +225,7 @@ class RuleSourceLibrary{
    const mishap=this.search("wizard mishap natural 1",false,5).some(x=>x.book==="01"&&x.page===81);
    const reaches=this.search("hex travel terrain",true,5).some(x=>x.book==="02"&&x.page===225);
    const gm=this.search("forest encounter table",true,5).some(x=>x.book==="03"&&x.page===54);
+   const namedRegion=this.search("Sablewood encounter table",true,5).some(x=>x.book==="03"&&x.page===55);
    const context=this.promptContext("wizard mishap",false),grounded=context.text.includes("[01, p. 81")&&context.refs.includes("01, p. 81 — Wizard Mishaps");
    const bounded=context.text.length<=7200;
    this.status="not-loaded";this.ready=false;const missing=this.promptContext("wizard mishap",false).text.includes("SOURCE LIBRARY STATUS: NOT LOADED");
@@ -229,6 +233,7 @@ class RuleSourceLibrary{
     {name:"wizard mishap query retrieves the core source page",pass:mishap},
     {name:"Reaches hex-travel query retrieves the player procedure",pass:reaches},
     {name:"GM encounter query retrieves setting encounter material",pass:gm},
+    {name:"named region query favors the matching encounter table",pass:namedRegion},
     {name:"prompt context carries book/page citations",pass:grounded},
     {name:"retrieved context stays within the size budget",pass:bounded},
     {name:"missing library is disclosed to the model",pass:missing}
