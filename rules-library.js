@@ -204,9 +204,9 @@ class RuleSourceLibrary{
  }
  runTests(){
   const samples=[
-   {id:"01",label:"Core Rules",content:"{80}----------------\n## Morale\nEnemies reduced to half their number flee if they fail a DC 15 Wisdom check.\n{81}----------------\n## Wizard Mishaps\nOn a natural 1, roll on the wizard mishap table for the spell tier."},
-   {id:"02",label:"Player Guide",content:"{225}----------------\n## Hex Crawling\nTravel across six-mile hexes. Terrain changes the daily travel budget.\n{226}----------------\n## Climate\nStormy weather changes foraging."},
-   {id:"03",label:"Game Master Guide",content:"{54}----------------\n## Forest Encounters\nUse the regional encounter table when the party travels through the forest."}
+   {id:"01",label:"Core Rules",content:"{80}----------------\n## Morale\nEnemies reduced to half their number flee if they fail a DC 15 Wisdom check. Large groups make one check using the leader Wisdom modifier, while a solo enemy checks when it reaches half its hit points.\n{81}----------------\n## Wizard Mishaps\nOn a natural 1, roll on the wizard mishap table for the spell tier. The result may harm the caster, change the spell target, or impose a further restriction. Use the table printed for the caster spell tier."},
+   {id:"02",label:"Player Guide",content:"{225}----------------\n## Hex Crawling\nTravel across six-mile hexes. Terrain changes the daily travel budget, and the party selects a travel method before moving. Weather and encounters are resolved through the travel procedure.\n{226}----------------\n## Climate\nStormy weather changes foraging. The region and season determine the climate, and harsh climate changes the party ration requirement."},
+   {id:"03",label:"Game Master Guide",content:"{54}----------------\n## Forest Encounters\nUse the regional encounter table when the party travels through the forest. Roll the listed die and apply the keyed encounter result; do not substitute a different terrain table."}
   ];
   const prior={documents:this.documents,chunks:this.chunks,ready:this.ready,status:this.status,error:this.error,origin:this.origin};
   try{
