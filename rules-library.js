@@ -175,6 +175,11 @@ class RuleSourceLibrary{
     if(chunk.title.toLowerCase().includes(term))score+=4*weight;
    }
    if(score<=0)continue;
+   const titleLower=chunk.title.toLowerCase();
+   // Table-of-contents entries are navigation aids, never rules evidence.
+   if(titleLower==="contents"||titleLower.includes("table of contents"))score*=0.08;
+   // City movement is a distinct procedure and should not outrank hex crawling.
+   if((base.includes("hex")||base.includes("crawling"))&&/travel in the city|city travel/.test(titleLower))score*=0.18;
    if(chunk.book==="01")score*=isReaches?0.96:1.18;
    if(chunk.book==="02")score*=isReaches?1.30:0.78;
    if(chunk.book==="03")score*=isReaches?1.40:0.68;
