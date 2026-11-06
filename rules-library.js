@@ -163,7 +163,7 @@ class RuleSourceLibrary{
   try{await writeCache(docs);this.cacheWarning="";}catch(error){this.cacheWarning="Browser storage unavailable; source books remain loaded until this page closes. "+error.message;}
   this.activate(docs,"imported local files");return this.summary();
  }
- search(query,isReaches=false,limit=5){
+ search(query,isReaches=false,limit=5,placeHint=""){
   if(!this.ready||!this.chunks.length)return [];
   const base=tokens(query),expanded=new Map();
   for(const token of base){expanded.set(token,1);(SYNONYMS[token]||[]).forEach(term=>{if(!expanded.has(term))expanded.set(term,0.42);});}
@@ -178,7 +178,12 @@ class RuleSourceLibrary{
     if(chunk.title.toLowerCase().includes(term))score+=4*weight*inverseDocumentWeight;
    }
    if(score<=0)continue;
-   const titleLower=chunk.title.toLowerCase();
+   const titleLower=chunk.title.toLowerCase(),hintTerms=tokens(placeHint).filter(term=>{const frequency=this.termDocumentFrequency.get(term)||0;return frequency>0&&frequency<80;});
+   if(hintTerms.length){
+    const placeMatches=hintTerms.filter(term=>chunk.searchText.includes(term)).length;
+    if(placeMatches)score+=8*placeMatches;
+    else if(/encounter|keyed site|master hex key|region/.test(titleLower))score*=0.20;
+   }
    // Table-of-contents entries are navigation aids, never rules evidence.
    if(titleLower==="contents"||titleLower.includes("table of contents"))score*=0.08;
    // City movement is a distinct procedure and should not outrank hex crawling.
@@ -198,8 +203,8 @@ class RuleSourceLibrary{
   }
   return results;
  }
- promptContext(query,isReaches=false){
-  const hits=this.search(query,isReaches,5);
+ promptContext(query,isReaches=false,placeHint=""){
+  const hits=this.search(query,isReaches,5,placeHint);
   const policy="SOURCE RETRIEVAL POLICY\nUse the retrieved source passages below before applying a rule, table, spell mishap, creature ability, or Western Reaches procedure. Source precedence: 01 is the core Shadowdark rules; 02 contains player-facing Western Reaches options and procedures; 03 contains GM-facing Western Reaches setting, encounters, and keyed material. Use 02/03 setting rules only when the campaign is in the Western Reaches. Do not combine a setting override with the replaced core procedure. Treat retrieved text as the source, not as permission to invent omitted table results. Cite only the book/page references actually supplied below. If the needed table or rule is not present, state that it was not retrieved and do not fabricate a table result or page citation.";
   if(!this.ready)return {hits:[],refs:[],text:policy+"\n\nSOURCE LIBRARY STATUS: NOT LOADED. The local source books are unavailable to this turn. Do not claim to have consulted them or invent exact source citations. Use only mechanics explicitly present in the engine contract; identify missing source-specific tables as unavailable."};
   if(!hits.length)return {hits:[],refs:[],text:policy+"\n\nSOURCE LIBRARY STATUS: READY, BUT NO RELEVANT PASSAGE WAS FOUND FOR THIS QUERY. Do not invent a rule citation or pretend the source was checked. Use the deterministic engine contract where it clearly applies; identify uncertain source-specific details."};
@@ -217,7 +222,7 @@ class RuleSourceLibrary{
   const samples=[
    {id:"01",label:"Core Rules",content:"{80}----------------\n## Morale\nEnemies reduced to half their number flee if they fail a DC 15 Wisdom check. Large groups make one check using the leader Wisdom modifier, while a solo enemy checks when it reaches half its hit points.\n{81}----------------\n## Wizard Mishaps\nOn a natural 1, roll on the wizard mishap table for the spell tier. The result may harm the caster, change the spell target, or impose a further restriction. Use the table printed for the caster spell tier."},
    {id:"02",label:"Player Guide",content:"{225}----------------\n## Hex Crawling\nTravel across six-mile hexes. Terrain changes the daily travel budget, and the party selects a travel method before moving. Weather and encounters are resolved through the travel procedure.\n{226}----------------\n## Climate\nStormy weather changes foraging. The region and season determine the climate, and harsh climate changes the party ration requirement."},
-   {id:"03",label:"Game Master Guide",content:"{54}----------------\n## Forest Encounters\nUse the regional encounter table when the party travels through the forest. Roll the listed die and apply the keyed encounter result; do not substitute a different terrain table.\n{55}----------------\n## Sablewood Encounters\nSablewood encounters use the Sablewood regional encounter table. The table's results are specific to this forest and should not be replaced with canyon or desert results."}
+   {id:"03",label:"Game Master Guide",content:"{54}----------------\n## Forest Encounters\nUse the regional encounter table when the party travels through the forest. Roll the listed die and apply the keyed encounter result; do not substitute a different terrain table.\n{55}----------------\n## Sablewood Encounters\nSablewood encounters use the Sablewood regional encounter table. The table's results are specific to this forest and should not be replaced with canyon or desert results.\n{56}----------------\n## Canyon Encounters\nCanyon encounters use the canyon regional encounter table. The table's results are specific to canyon terrain and should not be used for the Sablewood."}
   ];
   const prior={documents:this.documents,chunks:this.chunks,ready:this.ready,status:this.status,error:this.error,origin:this.origin};
   try{
@@ -225,7 +230,7 @@ class RuleSourceLibrary{
    const mishap=this.search("wizard mishap natural 1",false,5).some(x=>x.book==="01"&&x.page===81);
    const reaches=this.search("hex travel terrain",true,5).some(x=>x.book==="02"&&x.page===225);
    const gm=this.search("forest encounter table",true,5).some(x=>x.book==="03"&&x.page===54);
-   const namedRegion=this.search("Sablewood encounter table",true,5).some(x=>x.book==="03"&&x.page===55);
+   const namedRegionHits=this.search("regional encounter table",true,5,"Sablewood"),namedRegion=namedRegionHits.some(x=>x.book==="03"&&x.page===55)&&!namedRegionHits.some(x=>x.book==="03"&&x.page===56);
    const context=this.promptContext("wizard mishap",false),grounded=context.text.includes("[01, p. 81")&&context.refs.includes("01, p. 81 — Wizard Mishaps");
    const bounded=context.text.length<=7200;
    this.status="not-loaded";this.ready=false;const missing=this.promptContext("wizard mishap",false).text.includes("SOURCE LIBRARY STATUS: NOT LOADED");
