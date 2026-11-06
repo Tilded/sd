@@ -1,0 +1,13 @@
+# Known Limitations
+
+- **No first-person 3D dungeon.** The interface is a text-first campaign console with a dark, Etrian-Odyssey-inspired layout. It does not render a navigable 3D dungeon, animated miniatures, or a tactical grid.
+- **No pre-keyed adventures.** The sample campaign is a starter scene, not a complete published adventure. You supply the scenario, locations, factions, secrets, and keyed content through play.
+- **No bundled rulebook compendium.** The anti-drift prompt and deterministic kernel encode the procedures in the engine specification, but the app does not bundle the full Shadowdark rulebooks, encounter tables, wizard mishap tables, deity penance tables, or Western Reaches source PDFs. Some table-specific outcomes therefore still need the relevant source text or a GM ruling.
+- **The AI is not the rules engine.** The model can still misunderstand fiction, choose a poor tool call, or return invalid JSON. The app retries JSON parsing once and exposes raw responses in Debug; it cannot guarantee good judgment from every model.
+- **No full character builder or level-up chooser.** The sample party is preloaded, and additional companions use a simple default stat package plus a policy string. The engine flags level advancement and increases maximum HP, but does not provide the full talent, spell, title, or class advancement selection workflow.
+- **Limited narrative recall.** The model receives the current campaign state and a bounded recent journal window, not the entire conversation transcript. Older narrative details that were never represented in state can be forgotten by the DM.
+- **Browser-local persistence only.** Campaigns and settings live in the current browser's `localStorage`. There is no account login, cloud sync, multiplayer, conflict resolution, or automatic backup. Export JSON regularly.
+- **The API key is client-side.** The key is stored in `localStorage` and used directly by the browser. There is no server-side proxy or secret vault. Do not publish a configured copy or use it on a shared device.
+- **Provider and CORS requirements apply.** OpenAI requests require a valid API key and API billing. Ollama must be running with its OpenAI-compatible endpoint and allow requests from the browser origin. Some browsers treat `file://` storage or cross-origin requests differently; if direct-file mode is blocked, use Replit Preview or another local static server.
+- **No audio, voice, or map routing.** The app does not speak narration, create maps, calculate real-world routes, or render sound effects.
+- **No automatic ruleset updates.** The kernel and prompt are a fixed implementation of the supplied specification. Changes to Shadowdark or the Western Reaches procedures require code and prompt updates.
