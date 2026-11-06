@@ -177,15 +177,15 @@ class RuleSourceLibrary{
     if(occurrences>0)score+=(1+Math.log(occurrences))*weight*inverseDocumentWeight;
     if(chunk.title.toLowerCase().includes(term))score+=4*weight*inverseDocumentWeight;
    }
-   if(score<=0)continue;
    const titleLower=chunk.title.toLowerCase(),hintTerms=tokens(placeHint).filter(term=>{const frequency=this.termDocumentFrequency.get(term)||0;return frequency>0&&frequency<80;});
    if(hintTerms.length){
     const titlePlaceMatches=hintTerms.filter(term=>titleLower.includes(term)).length;
     const bodyPlaceMatches=hintTerms.filter(term=>chunk.searchText.includes(term)&&!titleLower.includes(term)).length;
     if(titlePlaceMatches)score+=18*titlePlaceMatches;
-    if(bodyPlaceMatches)score+=2*bodyPlaceMatches;
-    if(!titlePlaceMatches&&!bodyPlaceMatches&&/encounter|keyed site|master hex key|region/.test(titleLower))score*=0.20;
+    else if(bodyPlaceMatches)score*=0.35;
+    else if(/encounter|keyed site|master hex key|region/.test(titleLower))score*=0.20;
    }
+   if(score<=0)continue;
    // Table-of-contents entries are navigation aids, never rules evidence.
    if(titleLower==="contents"||titleLower.includes("table of contents"))score*=0.08;
    // City movement is a distinct procedure and should not outrank hex crawling.
